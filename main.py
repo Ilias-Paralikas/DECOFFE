@@ -8,9 +8,9 @@ import torch.nn as nn
 import torch    
 
 import json
-import sys
+import argparse
 import matplotlib.pyplot as plt 
-
+import os 
 #DONT CHANGE
 NUMBER_OF_CLOUDS = 1
 def remove_id_from_list(lst, server_id):
@@ -18,11 +18,14 @@ def remove_id_from_list(lst, server_id):
 
 
 if __name__ =='__main__':
-    if len(sys.argv) >1:
-        hyperparameters_file = sys.argv[1]
-    else :
-        hyperparameters_file = 'metadata/hyperparameters.json'
+    parser = argparse.ArgumentParser(description='Script Configuration via Command Line')
+    parser.add_argument('--hyperparameters_file', type=str, default='metadata/hyperparameters.json', help='Hyperparameters File')
+
+    args = parser.parse_args()
+    hyperparameters_file = args.hyperparameters_file
         
+    if not os.path.isfile(hyperparameters_file):
+        os.system('python metadata/hyperparameter_generator.py')
     with open(hyperparameters_file, 'r') as file:
         hyperparameters = json.load(file)
         
@@ -100,6 +103,7 @@ if __name__ =='__main__':
     drop_ratio_history =[]
     epsilon_history =[]
     for episode in range(episodes):
+        np.random.seed(0)
         done = False
         local_observations,active_queues = environment.reset()
         score =0

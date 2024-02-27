@@ -1,5 +1,5 @@
 {
-    "episodes": 10,
+    "episodes": 1000,
     "number_of_servers": 3,
     "cloud_computational_capacity": 30,
     "episode_time": 100,
