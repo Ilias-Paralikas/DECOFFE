@@ -5,34 +5,48 @@ from drl.agent import Agent
 import numpy as np
 
 import torch.nn as nn
-import torch.optim as optim
 import torch    
+
+import json
+import sys
+import matplotlib.pyplot as plt 
 
 #DONT CHANGE
 NUMBER_OF_CLOUDS = 1
-np.random.seed(0)
 def remove_id_from_list(lst, server_id):
     return lst[:server_id] + lst[server_id+1:]
 
 
 if __name__ =='__main__':
-
-    episodes  =1000
-    number_of_servers =3
-    servers_private_queues_computational_capacities = 2.5 *np.ones(number_of_servers)
-    servers_public_queues_computational_capacities = 10 *np.ones(number_of_servers)
-    transmission_capacities = 14 * np.ones([number_of_servers, (number_of_servers-1)+NUMBER_OF_CLOUDS])   # Mbps * duration
-    cloud_computational_capacity = 30
+    if len(sys.argv) >1:
+        hyperparameters_file = sys.argv[1]
+    else :
+        hyperparameters_file = 'metadata/hyperparameters.json'
+        
+    with open(hyperparameters_file, 'r') as file:
+        hyperparameters = json.load(file)
+        
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')    
+    print(device)
+    print(hyperparameters)
+        
+    episodes  =hyperparameters['episodes']
+    number_of_servers = hyperparameters['number_of_servers']
+    
+    servers_private_queues_computational_capacities = np.array(hyperparameters['servers_private_queues_computational_capacities'])
+    servers_public_queues_computational_capacities = np.array(hyperparameters['servers_public_queues_computational_capacities'])
+    transmission_capacities =  np.array(hyperparameters['transmission_capacities'])
+    cloud_computational_capacity = hyperparameters['cloud_computational_capacity']
     
     
-    episode_time =100
-    timeout_delay =10 
-    max_bit_arrive = 5
-    min_bit_arrive =2
-    task_arrive_probability=0.4
-    delta_duration=0.1
-    task_drop_penalty_multiplier=4
-    task_computational_density = 0.297
+    episode_time =hyperparameters['episode_time']
+    timeout_delay =hyperparameters ['timeout_delay']
+    max_bit_arrive = hyperparameters['max_bit_arrive']
+    min_bit_arrive =hyperparameters['min_bit_arrive']
+    task_arrive_probability=hyperparameters['task_arrive_probability']
+    delta_duration=hyperparameters['delta_duration']
+    task_drop_penalty_multiplier=hyperparameters['task_drop_penalty_multiplier']
+    task_computational_density = hyperparameters['task_computational_density']
     environment = Environment(
                  servers_private_queues_computational_capacities=servers_private_queues_computational_capacities,
                  servers_public_queues_computational_capacities=servers_public_queues_computational_capacities,
@@ -51,17 +65,17 @@ if __name__ =='__main__':
     
     state_dimensions,lstm_shape,number_of_actions = environment.get_agent_variables()
            
-    hidden_layers =[100]
-    lstm_layers = 20
-    epsilon_decrement =1e-4
-    batch_size =64
-    learning_rate =1e-3
-    memory_size = int(1e4)
-    lstm_time_step = 10
-    replace_target_iter = 500
-    optimizer=optim.Adam
-    loss_function=nn.MSELoss
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')    
+    hidden_layers =hyperparameters['hidden_layers']
+    lstm_layers = hyperparameters['lstm_layers']
+    epsilon_decrement =hyperparameters['epsilon_decrement']
+    batch_size =hyperparameters['batch_size']
+    learning_rate =hyperparameters['learning_rate']
+    memory_size = hyperparameters['memory_size']
+    lstm_time_step = hyperparameters['lstm_time_step']
+    replace_target_iter = hyperparameters['replace_target_iter']
+    
+    loss_function = getattr(nn, hyperparameters['loss_function'])
+    optimizer = getattr(torch.optim, hyperparameters['optimizer'])
     
     agents = [Agent(
                     id =i,
@@ -81,10 +95,15 @@ if __name__ =='__main__':
                     device=device) 
         for i in range(number_of_servers)]
     
-    scores = []
+    scores_history = []
+    drop_ratio_history =[]
+    epsilon_history =[]
     for episode in range(episodes):
         done = False
         local_observations,active_queues = environment.reset()
+        score =0
+        tasks_arrived = 0
+        tasks_dropped = 0
         
         while not done:
             actions = np.zeros(number_of_servers,dtype=np.int8)
@@ -92,8 +111,9 @@ if __name__ =='__main__':
                 lstm_input = remove_id_from_list(active_queues,i)
                 actions[i] = agents[i].choose_action(local_observations[i],lstm_input)
             (local_observations_,active_queues_), rewards, done, info = environment.step(actions)
-            score = np.mean(rewards)
-            scores.append(score)
+            tasks_arrived += info['tasks_arrived']
+            tasks_dropped +=info['tasks_dropped']
+            score += np.mean(rewards)
             new_lstm_input = remove_id_from_list(active_queues_,i)
             for i in range(number_of_servers):
                 agents[i].store_transitions(state = local_observations[i],
@@ -106,6 +126,14 @@ if __name__ =='__main__':
                 agents[i].learn()
                 
             local_observations,active_queues  = local_observations_,active_queues_
-            
-        avg_score = np.mean(scores[-100:])
-        print('Episode: {}\tScore: {}\t Average Score: {}\tEpsilon {}'.format(episode,score,avg_score,agents[0].epsilon))
+        
+        scores_history.append(score)
+        drop_ratio = tasks_dropped/tasks_arrived
+        epsilon_history.append(agents[0].epsilon)
+        drop_ratio_history.append(drop_ratio)
+        avg_score = np.mean(scores_history[-100:])
+
+        print('Episode: {}\tScore: {}\t Average Score: {}\tDrop Ratio: {}\tEpsilon: {}'.format(episode,score,avg_score,drop_ratio,agents[0].epsilon))
+    plt.plot(epsilon_history)
+    plt.plot(drop_ratio_history)
+    plt.plot(scores_history)

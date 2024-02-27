@@ -164,8 +164,10 @@ class Environment:
             
         active_queues =[s.get_active_public_queues() for s in self.servers]           
         active_queues.append(self.cloud.get_active_queues())     
-        
-        info = {}
-        
         observations = (local_observations,active_queues)
+
+
+        info = {}
+        info['tasks_arrived'] = np.count_nonzero(self.bitarrive)
+        info['tasks_dropped'] = -np.sum(np.ceil(rewards))
         return observations, rewards, done, info

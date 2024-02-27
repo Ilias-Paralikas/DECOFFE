@@ -158,8 +158,12 @@ class Agent():
   def choose_action(self,observation,lstm_state):
     self.lstm_history.append(lstm_state)
     if np.random.uniform() > self.epsilon:
-      observation = torch.tensor([observation],dtype=torch.float32).to(self.device)
-      lstm_input = torch.tensor([self.lstm_history],dtype=torch.float32).to(self.device)
+      
+      observation_np = np.expand_dims(observation,axis=0) # Convert the list of NumPy arrays to a single NumPy array
+      lstm_history_np = np.expand_dims(self.lstm_history,axis=0)  # Convert the list of NumPy arrays to a single NumPy array
+
+      observation = torch.tensor(observation_np,dtype=torch.float32).to(self.device)
+      lstm_input = torch.tensor(lstm_history_np,dtype=torch.float32).to(self.device)
       action = np.argmax(self.Q_eval_network(observation, lstm_input).detach().cpu().numpy())
     else:
       action = np.random.randint(0,self.number_of_actions)
