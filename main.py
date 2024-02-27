@@ -138,7 +138,7 @@ if __name__ =='__main__':
         drop_ratio_history.append(drop_ratio)
         avg_score = np.mean(scores_history[-100:])
 
-        print('Episode: {}\tScore: {}\t Average Score: {}\tDrop Ratio: {}\tEpsilon: {}'.format(episode,score,avg_score,drop_ratio,agents[0].epsilon))
+        print('Episode: {:.3f}\tScore: {:.3f}\t Average Score: {:.3f}\tDrop Ratio: {:.3f}\tEpsilon: {:.3f}'.format(episode,score,avg_score,drop_ratio,agents[0].epsilon))
     plt.plot(epsilon_history)
     plt.plot(drop_ratio_history)
     plt.plot(scores_history)
