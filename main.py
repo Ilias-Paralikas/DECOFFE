@@ -28,7 +28,8 @@ if __name__ =='__main__':
         
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')    
     print(device)
-    print(hyperparameters)
+    for key in hyperparameters:
+        print(key," : ",hyperparameters[key])
         
     episodes  =hyperparameters['episodes']
     number_of_servers = hyperparameters['number_of_servers']
