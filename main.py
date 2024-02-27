@@ -119,8 +119,8 @@ if __name__ =='__main__':
             tasks_arrived += info['tasks_arrived']
             tasks_dropped +=info['tasks_dropped']
             score += np.mean(rewards)
-            new_lstm_input = remove_id_from_list(active_queues_,i)
             for i in range(number_of_servers):
+                new_lstm_input = remove_id_from_list(active_queues_,i)
                 agents[i].store_transitions(state = local_observations[i],
                                             lstm_state=lstm_input,
                                             action = actions[i],
