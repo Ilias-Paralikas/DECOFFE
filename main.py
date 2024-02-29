@@ -36,66 +36,39 @@ if __name__ =='__main__':
         
     episodes  =hyperparameters['episodes']
     number_of_servers = hyperparameters['number_of_servers']
-    
-    servers_private_queues_computational_capacities = np.array(hyperparameters['servers_private_queues_computational_capacities'])
-    servers_public_queues_computational_capacities = np.array(hyperparameters['servers_public_queues_computational_capacities'])
-    transmission_capacities =  np.array(hyperparameters['transmission_capacities'])
-    cloud_computational_capacity = hyperparameters['cloud_computational_capacity']
-    
-    
-    episode_time =hyperparameters['episode_time']
-    timeout_delay =hyperparameters ['timeout_delay']
-    max_bit_arrive = hyperparameters['max_bit_arrive']
-    min_bit_arrive =hyperparameters['min_bit_arrive']
-    task_arrive_probability=hyperparameters['task_arrive_probability']
-    delta_duration=hyperparameters['delta_duration']
-    task_drop_penalty_multiplier=hyperparameters['task_drop_penalty_multiplier']
-    task_computational_density = hyperparameters['task_computational_density']
     environment = Environment(
-                 servers_private_queues_computational_capacities=servers_private_queues_computational_capacities,
-                 servers_public_queues_computational_capacities=servers_public_queues_computational_capacities,
-                 transmission_capacities=transmission_capacities,
-                 cloud_computational_capacity=cloud_computational_capacity,
-                 episode_time=episode_time,
-                 timeout_delay=timeout_delay,
-                 max_bit_arrive=max_bit_arrive ,
-                 min_bit_arrive=min_bit_arrive ,
-                 task_arrive_probability=task_arrive_probability,
-                 delta_duration=delta_duration,
-                 task_drop_penalty_multiplier=task_drop_penalty_multiplier,
-                 task_computational_density=task_computational_density,
+                servers_private_queues_computational_capacities = np.array(hyperparameters['servers_private_queues_computational_capacities']),
+                servers_public_queues_computational_capacities = np.array(hyperparameters['servers_public_queues_computational_capacities']),
+                transmission_capacities =  np.array(hyperparameters['transmission_capacities']),
+                cloud_computational_capacity = hyperparameters['cloud_computational_capacity'],
+                episode_time =hyperparameters['episode_time'],
+                timeout_delay =hyperparameters ['timeout_delay'],
+                max_bit_arrive = hyperparameters['max_bit_arrive'],
+                min_bit_arrive =hyperparameters['min_bit_arrive'],
+                task_arrive_probability=hyperparameters['task_arrive_probability'],
+                delta_duration=hyperparameters['delta_duration'],
+                task_drop_penalty_multiplier=hyperparameters['task_drop_penalty_multiplier'],
+                task_computational_density = hyperparameters['task_computational_density'],
                  number_of_clouds=NUMBER_OF_CLOUDS)
     
     
     state_dimensions,lstm_shape,number_of_actions = environment.get_agent_variables()
-           
-    hidden_layers =hyperparameters['hidden_layers']
-    lstm_layers = hyperparameters['lstm_layers']
-    epsilon_decrement =hyperparameters['epsilon_decrement']
-    batch_size =hyperparameters['batch_size']
-    learning_rate =hyperparameters['learning_rate']
-    memory_size = hyperparameters['memory_size']
-    lstm_time_step = hyperparameters['lstm_time_step']
-    replace_target_iter = hyperparameters['replace_target_iter']
+
     
-    loss_function = getattr(nn, hyperparameters['loss_function'])
-    optimizer = getattr(torch.optim, hyperparameters['optimizer'])
-    
-    agents = [Agent(
-                    id =i,
+    agents = [Agent(id =i,
                     state_dimensions=state_dimensions,
                     lstm_shape=lstm_shape,
                     number_of_actions=number_of_actions,
-                    hidden_layers = hidden_layers,
-                    lstm_layers = lstm_layers,
-                    epsilon_decrement=epsilon_decrement,
-                    batch_size = batch_size,
-                    learning_rate=learning_rate,
-                    memory_size=memory_size,
-                    lstm_time_step=lstm_time_step,
-                    replace_target_iter=replace_target_iter,
-                    optimizer=optimizer,
-                    loss_function=loss_function,
+                    hidden_layers =hyperparameters['hidden_layers'],
+                    lstm_layers = hyperparameters['lstm_layers'],
+                    epsilon_decrement =hyperparameters['epsilon_decrement'],
+                    batch_size =hyperparameters['batch_size'],
+                    learning_rate =hyperparameters['learning_rate'],
+                    memory_size = hyperparameters['memory_size'],
+                    lstm_time_step = hyperparameters['lstm_time_step'],
+                    replace_target_iter = hyperparameters['replace_target_iter'],
+                    loss_function = getattr(nn, hyperparameters['loss_function']),
+                    optimizer = getattr(torch.optim, hyperparameters['optimizer']),
                     device=device) 
         for i in range(number_of_servers)]
     
