@@ -76,7 +76,6 @@ if __name__ =='__main__':
     drop_ratio_history =[]
     epsilon_history =[]
     for episode in range(episodes):
-        np.random.seed(0)
         done = False
         local_observations,active_queues = environment.reset()
         score =0
