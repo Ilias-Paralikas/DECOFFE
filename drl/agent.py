@@ -198,7 +198,7 @@ class Agent():
 
  
 
-    max_memory = min(self.memory_counter, self.memory_size)
+    max_memory = min(self.memory_counter, self.memory_size-1)
     batch_indices = np.random.choice(max_memory, self.batch_size, replace=False)
 
     state_batch = torch.tensor(self.state_memory[batch_indices]).to(self.device)

@@ -17,7 +17,7 @@
     "epsilon_decrement": 0.0001,
     "batch_size": 64,
     "learning_rate": 0.001,
-    "memory_size": 10000,
+    "memory_size": 100,
     "lstm_time_step": 10,
     "replace_target_iter": 500,
     "optimizer": "Adam",

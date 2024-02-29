@@ -8,6 +8,8 @@ def comma_seperated_string_to_list(comma_seperated_String):
 
 if __name__=="__main__":
         parser = argparse.ArgumentParser(description='Script Configuration via Command Line')
+        
+        
 
         parser.add_argument('--servers_private_queues_computational_capacities', type=float, default=2.5, help='Servers private queues computational capacities')
         parser.add_argument('--servers_public_queues_computational_capacities', type=float, default=5, help='Servers public queues computational capacities')
