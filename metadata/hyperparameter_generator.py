@@ -34,7 +34,7 @@ if __name__=="__main__":
         # Neural network hyperparameters
         parser.add_argument('--hidden_layers', type=str, default='100', help='Hidden layers sizes, comma-separated')
         parser.add_argument('--lstm_layers', type=int, default=20, help='LSTM layers')
-        parser.add_argument('--epsilon_decrement', type=float, default=1e-4, help='Epsilon decrement')
+        parser.add_argument('--epsilon_decrement', type=float, default=15e-6, help='Epsilon decrement')
         parser.add_argument('--batch_size', type=int, default=64, help='Batch size')
         parser.add_argument('--learning_rate', type=float, default=1e-3, help='Learning rate')
         parser.add_argument('--memory_size', type=int, default=int(1e4), help='Memory size')
