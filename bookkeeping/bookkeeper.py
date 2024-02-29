@@ -3,6 +3,7 @@ import os
 import pickle
 import matplotlib.pyplot as plt
 import itertools
+import json
 class Bookkeeper:
     def __init__(self,log_folder,hyperparameters,device='cpu'):
         self.reset_episode()
@@ -20,6 +21,8 @@ class Bookkeeper:
         print(device)
         for key in hyperparameters:
             print(key," : ",hyperparameters[key])
+    
+
         
         
 
@@ -103,6 +106,15 @@ class Bookkeeper:
         run_folder=  self.log_folder+'/run_'+str(run_index)
         os.mkdir(run_folder)
                 
+        filename = run_folder+'/hyperparameters.json'
+
+            
+        json_object = json.dumps(self.hyperparameters,indent=4) ### this saves the array in .json format)
+        
+        with open(filename, "w") as outfile:
+                outfile.write(json_object)
+        
+                        
         with open(run_folder+'/details.pickle', 'wb') as handle:
             pickle.dump(run_details, handle, protocol=pickle.HIGHEST_PROTOCOL)
             
