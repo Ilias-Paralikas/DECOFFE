@@ -2,7 +2,7 @@ import numpy as np
 import os
 import pickle
 import matplotlib.pyplot as plt
-
+import itertools
 class Bookkeeper:
     def __init__(self,log_folder,hyperparameters,device='cpu'):
         self.reset_episode()
@@ -108,15 +108,28 @@ class Bookkeeper:
             
         
 
-        plt.plot(metrics['total_score_history'])
+        marker = itertools.cycle(('d', 's', '*','X', 'p','1'))
+        linestyles = itertools.cycle(('-','--','-.',':'))
+        plt.plot(metrics['total_score_history'],label='Mean score',marker= next(marker),linestyle=next(linestyles))
+        for agent_id in range(len(metrics['score_history'][0])):
+            agent_score = [row[agent_id] for row in metrics['score_history']]
+            plt.plot(agent_score,label='agent '+str(agent_id) + 'score',marker= next(marker),linestyle=next(linestyles))
+        plt.legend()
         plt.savefig(run_folder+'/total_score_history')
         plt.close()
         
         
         
 
-        plt.plot(metrics['total_drop_ratio_history'])
+        marker = itertools.cycle(('d', 's', '*','X', 'p','1'))
+        linestyles = itertools.cycle(('-','--','-.',':'))
+        plt.plot(metrics['total_drop_ratio_history'],label='Total drop ratio',marker= next(marker),linestyle=next(linestyles))
+        for agent_id in range(len(metrics['drop_ratio_history'][0])):
+            agent_drop_rate = [row[agent_id] for row in metrics['drop_ratio_history']]
+            plt.plot(agent_drop_rate,label='agent '+str(agent_id) + ' drop ratio',marker= next(marker),linestyle=next(linestyles))
+        plt.legend()
         plt.savefig(run_folder+'/total_drop_ratio_history')
         plt.close()
 
-            
+
+    
