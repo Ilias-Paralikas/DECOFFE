@@ -1,5 +1,10 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod] 
 # Ignore specific file
 hyperparameters/hyperparameters.json
-
+test.py
+run_index.txt
 # Ignore everything in a specific folder
-bookkeeping/
+bookkeeping/log_folder/
+.vscode/

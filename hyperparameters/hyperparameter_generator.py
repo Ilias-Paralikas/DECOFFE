@@ -36,7 +36,7 @@ if __name__=="__main__":
         parser.add_argument('--lstm_layers', type=int, default=20, help='LSTM layers')
         parser.add_argument('--epsilon_decrement', type=float, default=15e-6, help='Epsilon decrement')
         parser.add_argument('--batch_size', type=int, default=64, help='Batch size')
-        parser.add_argument('--learning_rate', type=float, default=1e-3, help='Learning rate')
+        parser.add_argument('--learning_rate', type=float, default=1e-4, help='Learning rate')
         parser.add_argument('--memory_size', type=int, default=int(1e4), help='Memory size')
         parser.add_argument('--lstm_time_step', type=int, default=10, help='LSTM time step')
         parser.add_argument('--replace_target_iter', type=int, default=500, help='Replace target iteration')

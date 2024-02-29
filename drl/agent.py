@@ -87,6 +87,7 @@ class Agent():
                 gamma=0.99,
                 epsilon=1,
                 epsilon_end=0.01,
+                local_action_probability = 0.5,
                 dueling=True):
       
     self.id = id
@@ -101,6 +102,7 @@ class Agent():
     self.epsilon_decrement = epsilon_decrement
     self.learning_rate =learning_rate
     self.epsilon_end =epsilon_end
+    self.local_action_probability =local_action_probability
 
     self.batch_size = batch_size
     self.memory_size=  memory_size
@@ -166,7 +168,10 @@ class Agent():
       lstm_input = torch.tensor(lstm_history_np,dtype=torch.float32).to(self.device)
       action = np.argmax(self.Q_eval_network(observation, lstm_input).detach().cpu().numpy())
     else:
-      action = np.random.randint(0,self.number_of_actions)
+        if np.random.rand() < self.local_action_probability:
+            action =  0
+        else:
+            action =  np.random.randint( 1, self.number_of_actions)
     return action
 
 
