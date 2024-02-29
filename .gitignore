@@ -1,0 +1,5 @@
+# Ignore specific file
+hyperparameters/hyperparameters.json
+
+# Ignore everything in a specific folder
+bookkeeping/

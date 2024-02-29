@@ -19,13 +19,13 @@ def remove_id_from_list(lst, server_id):
 
 if __name__ =='__main__':
     parser = argparse.ArgumentParser(description='Script Configuration via Command Line')
-    parser.add_argument('--hyperparameters_file', type=str, default='metadata/hyperparameters.json', help='Hyperparameters File')
+    parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='Hyperparameters File')
 
     args = parser.parse_args()
     hyperparameters_file = args.hyperparameters_file
         
     if not os.path.isfile(hyperparameters_file):
-        os.system('python metadata/hyperparameter_generator.py')
+        os.system('python hyperparameters/hyperparameter_generator.py')
     with open(hyperparameters_file, 'r') as file:
         hyperparameters = json.load(file)
         
@@ -114,3 +114,4 @@ if __name__ =='__main__':
     plt.plot(epsilon_history)
     plt.plot(drop_ratio_history)
     plt.plot(scores_history)
+    plt.show()

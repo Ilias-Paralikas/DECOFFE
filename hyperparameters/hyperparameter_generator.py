@@ -43,7 +43,7 @@ if __name__=="__main__":
         parser.add_argument('--optimizer', type=str, default='Adam', help='Optimizer')
         parser.add_argument('--loss_function', type=str, default='MSELoss', help='Loss function')
         
-        parser.add_argument('--hyperparameters_folder', type=str, default='metadata/hyperparameters.json', help='Hyperparameters Folder')
+        parser.add_argument('--hyperparameters_folder', type=str, default='hyperparameters/hyperparameters.json', help='Hyperparameters Folder')
 
 
         
