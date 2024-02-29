@@ -127,30 +127,38 @@ class Bookkeeper:
         
 
         linestyles = itertools.cycle(('-','--','-.',':'))
-        
-        plt.figure(figsize=(20,20))
-        plt.plot(metrics['total_score_history'],label='Mean score',linestyle=next(linestyles))
+        linewidth  =8
+        size =30
+        plt.figure(figsize=(size,size))
+        plt.plot(metrics['total_score_history'],label='Mean score',linestyle=next(linestyles),linewidth=linewidth)
         for agent_id in range(len(metrics['score_history'][0])):
             agent_score = [row[agent_id] for row in metrics['score_history']]
-            plt.plot(agent_score,label='agent '+str(agent_id) + 'score',linestyle=next(linestyles))
+            plt.plot(agent_score,label='agent '+str(agent_id) + 'score',linestyle=next(linestyles),linewidth=linewidth)
         plt.legend()
         plt.savefig(run_folder+'/total_score_history')
         plt.close()
         
 
         linestyles = itertools.cycle(('-','--','-.',':'))
-        plt.figure(figsize=(20,20))
-        plt.plot(metrics['total_drop_ratio_history'],label='Total drop ratio',linestyle=next(linestyles))
+        plt.figure(figsize=(size,size))
+        plt.plot(metrics['total_drop_ratio_history'],label='Total drop ratio',linestyle=next(linestyles),linewidth=linewidth)
         for agent_id in range(len(metrics['drop_ratio_history'][0])):
             agent_drop_rate = [row[agent_id] for row in metrics['drop_ratio_history']]
-            plt.plot(agent_drop_rate,label='agent '+str(agent_id) + ' drop ratio',linestyle=next(linestyles))
+            plt.plot(agent_drop_rate,label='agent '+str(agent_id) + ' drop ratio',linestyle=next(linestyles),linewidth=linewidth)
         plt.legend()
         plt.savefig(run_folder+'/total_drop_ratio_history')
         plt.close()
 
-        plt.figure(figsize=(20,20))
-        plt.plot(self.average_score_history,label='average score')
+        plt.figure(figsize=(size,size))
+        plt.plot(self.average_score_history,label='average score',linewidth=linewidth)
         plt.legend()
         plt.savefig(run_folder+'/average_score')
+        plt.close()
+    
+
+        plt.figure(figsize=(size,size))
+        plt.plot(self.epsilon_history,label='epsilon',linewidth=linewidth)
+        plt.legend()
+        plt.savefig(run_folder+'/epsilon_history')
         plt.close()
     
