@@ -9,6 +9,7 @@ class Bookkeeper:
         self.reset_episode()
         self.total_score_history =[]
         self.score_history =[]
+        self.average_score_history =[]
         
         self.total_drop_ratio_history =[]
         self.drop_ratio_history =[]
@@ -38,9 +39,13 @@ class Bookkeeper:
         episode_drop_ratio =  self.step_tasks_dropped/self.step_tasks_arrived 
         self.drop_ratio_history.append(episode_drop_ratio)
         
+        
+        average_score = np.mean(self.total_score_history[-100:])
+        self.average_score_history.append(average_score)
+        
         episode_metrics = {}
         episode_metrics['score'] = self.total_step_score
-        episode_metrics['avergae_score']  =np.mean(self.total_score_history[-100:])
+        episode_metrics['avergae_score']  = average_score
         episode_metrics['drop_ratio'] = total_episode_drop_ratio
 
         self.reset_episode()
@@ -120,28 +125,32 @@ class Bookkeeper:
             
         
 
-        marker = itertools.cycle(('d', 's', '*','X', 'p','1'))
         linestyles = itertools.cycle(('-','--','-.',':'))
-        plt.plot(metrics['total_score_history'],label='Mean score',marker= next(marker),linestyle=next(linestyles))
+        plt.plot(metrics['total_score_history'],label='Mean score',linestyle=next(linestyles))
         for agent_id in range(len(metrics['score_history'][0])):
             agent_score = [row[agent_id] for row in metrics['score_history']]
-            plt.plot(agent_score,label='agent '+str(agent_id) + 'score',marker= next(marker),linestyle=next(linestyles))
+            plt.plot(agent_score,label='agent '+str(agent_id) + 'score',linestyle=next(linestyles))
         plt.legend()
+        plt.figure(figsize=(20,20))
         plt.savefig(run_folder+'/total_score_history')
         plt.close()
         
-        
-        
 
-        marker = itertools.cycle(('d', 's', '*','X', 'p','1'))
         linestyles = itertools.cycle(('-','--','-.',':'))
-        plt.plot(metrics['total_drop_ratio_history'],label='Total drop ratio',marker= next(marker),linestyle=next(linestyles))
+        plt.plot(metrics['total_drop_ratio_history'],label='Total drop ratio',linestyle=next(linestyles))
         for agent_id in range(len(metrics['drop_ratio_history'][0])):
             agent_drop_rate = [row[agent_id] for row in metrics['drop_ratio_history']]
-            plt.plot(agent_drop_rate,label='agent '+str(agent_id) + ' drop ratio',marker= next(marker),linestyle=next(linestyles))
+            plt.plot(agent_drop_rate,label='agent '+str(agent_id) + ' drop ratio',linestyle=next(linestyles))
         plt.legend()
+        plt.figure(figsize=(20,20))
         plt.savefig(run_folder+'/total_drop_ratio_history')
         plt.close()
 
 
+        plt.plot(self.average_score_history,label='average score')
+        plt.legend()
+        plt.figure(figsize=(20,20))
+
+        plt.savefig(run_folder+'/average_score')
+        plt.close()
     
