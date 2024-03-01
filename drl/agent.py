@@ -85,12 +85,12 @@ class Agent():
                 optimizer,
                 loss_function,
                 device,
-                chechpoint_folder,
+                chechpoint_file,
                 gamma=0.99,
                 epsilon=1,
                 epsilon_end=0.01,
                 local_action_probability = 0.5,
-                save_model_frequency = 1000,
+                save_model_frequency = 100,
                 read_checkpoint = True,
                 dueling=True):
       
@@ -107,7 +107,7 @@ class Agent():
     self.learning_rate =learning_rate
     self.epsilon_end =epsilon_end
     self.local_action_probability =local_action_probability
-    self.chechpoint_folder= chechpoint_folder
+    self.chechpoint_file= chechpoint_file
     self.save_model_frequency = save_model_frequency
   
 
@@ -152,12 +152,12 @@ class Agent():
     self.terminal_memory= np.zeros(self.memory_size,dtype=bool)
 
   def store_model(self):
-    torch.save(self.Q_eval_network, self.chechpoint_folder)
+    torch.save(self.Q_eval_network, self.chechpoint_file)
     
   def load_model(self):
     try:
-      if os.path.isfile(self.chechpoint_folder):
-        self.Q_eval_network = torch.load(self.chechpoint_folder)
+      if os.path.isfile(self.chechpoint_file):
+        self.Q_eval_network = torch.load(self.chechpoint_file)
         print('model weights loaded')
       else:
         print('weights folder not found')

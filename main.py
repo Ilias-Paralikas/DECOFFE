@@ -23,18 +23,20 @@ if __name__ =='__main__':
 
     parser = argparse.ArgumentParser(description='Script Configuration via Command Line')
     parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='Hyperparameters File')
-    parser.add_argument('--log_folder', type=str, default='bookkeeping/log_folder', help='log folder')
-
     args = parser.parse_args()
     hyperparameters_file = args.hyperparameters_file
-    log_folder = args.log_folder
-        
+
     if not os.path.isfile(hyperparameters_file):
         os.system('python hyperparameters/hyperparameter_generator.py')
     with open(hyperparameters_file, 'r') as file:
         hyperparameters = json.load(file)
     
+    
+    os.makedirs(hyperparameters['chechpoint_folder'],exist_ok=True)
+    
+    log_folder = hyperparameters['log_folder']
     bookkeeper = Bookkeeper(log_folder,hyperparameters,device)
+    
  
         
     episodes  =hyperparameters['episodes']
@@ -73,7 +75,7 @@ if __name__ =='__main__':
                     loss_function = getattr(nn, hyperparameters['loss_function']),
                     optimizer = getattr(torch.optim, hyperparameters['optimizer']),
                     device=device,
-                    chechpoint_folder=hyperparameters['chechpoint_folder']+str(i)+'.pt') 
+                    chechpoint_file=hyperparameters['chechpoint_folder']+'/agent_'+str(i)+'.pt') 
         for i in range(number_of_servers)]
     
 
