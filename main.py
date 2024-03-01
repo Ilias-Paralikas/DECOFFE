@@ -10,7 +10,6 @@ import torch
 
 import json
 import argparse
-import matplotlib.pyplot as plt 
 import os 
 #DONT CHANGE
 NUMBER_OF_CLOUDS = 1
