@@ -16,9 +16,7 @@ import os
 NUMBER_OF_CLOUDS = 1
 def remove_id_from_list(lst, server_id):
     return lst[:server_id] + lst[server_id+1:]
-
-
-if __name__ =='__main__':
+def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')   
 
     parser = argparse.ArgumentParser(description='Script Configuration via Command Line')
@@ -110,3 +108,9 @@ if __name__ =='__main__':
         print('Episode: {}\tScore: {:.3f}\t Average Score: {:.3f}\tDrop Ratio: {:.3f}\tEpsilon: {:.3f}'.format(episode,score,average_score,drop_ratio ,epsilon))
 
     bookkeeper.store_run()
+    
+    
+
+
+if __name__ =='__main__':
+    main()
