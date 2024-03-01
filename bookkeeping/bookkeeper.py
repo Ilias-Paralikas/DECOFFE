@@ -5,11 +5,10 @@ import matplotlib.pyplot as plt
 import itertools
 import json
 class Bookkeeper:
-    def __init__(self,log_folder,hyperparameters,device='cpu'):
+    def __init__(self,log_folder,hyperparameters,device='cpu',average_window = 100):
         self.reset_episode()
         self.total_score_history =[]
         self.score_history =[]
-        self.average_score_history =[]
         
         self.total_drop_ratio_history =[]
         self.drop_ratio_history =[]
@@ -17,6 +16,7 @@ class Bookkeeper:
         
         self.hyperparameters =hyperparameters
         self.log_folder = log_folder
+        self.average_window=average_window
         
         os.makedirs(log_folder, exist_ok=True)
         print(device)
@@ -24,7 +24,15 @@ class Bookkeeper:
             print(key," : ",hyperparameters[key])
     
 
-        
+    def moving_average(self,lst):
+        averages = []
+        for i in range(len(lst)):
+            if i < self.average_window:
+                averages.append(sum(lst[:i+1]) / (i+1))
+            else:
+                averages.append(sum(lst[i-self.average_window+1:i+1]) / self.average_window)
+        return averages
+
         
 
         
@@ -40,8 +48,7 @@ class Bookkeeper:
         self.drop_ratio_history.append(episode_drop_ratio)
         
         
-        average_score = np.mean(self.total_score_history[-100:])
-        self.average_score_history.append(average_score)
+        average_score = np.mean(self.total_score_history[-self.average_window:])
         
         episode_metrics = {}
         episode_metrics['score'] = self.total_step_score
@@ -130,30 +137,36 @@ class Bookkeeper:
         linewidth  =8
         size =30
         plt.figure(figsize=(size,size))
-        plt.plot(metrics['total_score_history'],label='Mean score',linestyle=next(linestyles),linewidth=linewidth)
+
+        
+        
+        plt.figure(figsize=(size,size))
+        mean_score  = self.moving_average(metrics['total_score_history'])
+        plt.plot(mean_score,label='Mean score',linestyle=next(linestyles),linewidth=linewidth)
         for agent_id in range(len(metrics['score_history'][0])):
             agent_score = [row[agent_id] for row in metrics['score_history']]
-            plt.plot(agent_score,label='agent '+str(agent_id) + 'score',linestyle=next(linestyles),linewidth=linewidth)
+            agent_mean_score  = self.moving_average(agent_score)
+            plt.plot(agent_mean_score,label='agent '+str(agent_id) + 'score',linestyle=next(linestyles),linewidth=linewidth)
         plt.legend()
-        plt.savefig(run_folder+'/total_score_history')
+        plt.savefig(run_folder+'/mean_score_history')
         plt.close()
         
 
         linestyles = itertools.cycle(('-','--','-.',':'))
+        
         plt.figure(figsize=(size,size))
-        plt.plot(metrics['total_drop_ratio_history'],label='Total drop ratio',linestyle=next(linestyles),linewidth=linewidth)
+        mean_drop_ratio  = self.moving_average(metrics['total_drop_ratio_history'])
+
+        plt.plot(mean_drop_ratio,label='Total drop ratio',linestyle=next(linestyles),linewidth=linewidth)
         for agent_id in range(len(metrics['drop_ratio_history'][0])):
             agent_drop_rate = [row[agent_id] for row in metrics['drop_ratio_history']]
-            plt.plot(agent_drop_rate,label='agent '+str(agent_id) + ' drop ratio',linestyle=next(linestyles),linewidth=linewidth)
+            mean_agent_drop_rate = self.moving_average(agent_drop_rate)
+            plt.plot(mean_agent_drop_rate,label='agent '+str(agent_id) + ' drop ratio',linestyle=next(linestyles),linewidth=linewidth)
         plt.legend()
-        plt.savefig(run_folder+'/total_drop_ratio_history')
+        plt.savefig(run_folder+'/mean_drop_ratio_history')
         plt.close()
 
-        plt.figure(figsize=(size,size))
-        plt.plot(self.average_score_history,label='average score',linewidth=linewidth)
-        plt.legend()
-        plt.savefig(run_folder+'/average_score')
-        plt.close()
+     
     
 
         plt.figure(figsize=(size,size))
