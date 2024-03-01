@@ -32,7 +32,7 @@ if __name__ =='__main__':
         hyperparameters = json.load(file)
     
     
-    os.makedirs(hyperparameters['chechpoint_folder'],exist_ok=True)
+    os.makedirs(hyperparameters['checkpoint_folder'],exist_ok=True)
     
     log_folder = hyperparameters['log_folder']
     bookkeeper = Bookkeeper(log_folder,hyperparameters,device)
@@ -75,7 +75,7 @@ if __name__ =='__main__':
                     loss_function = getattr(nn, hyperparameters['loss_function']),
                     optimizer = getattr(torch.optim, hyperparameters['optimizer']),
                     device=device,
-                    chechpoint_file=hyperparameters['chechpoint_folder']+'/agent_'+str(i)+'.pt') 
+                    checkpoint_folder=hyperparameters['checkpoint_folder']+'/agent_'+str(i)+'.pt') 
         for i in range(number_of_servers)]
     
 

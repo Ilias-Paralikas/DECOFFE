@@ -44,7 +44,7 @@ if __name__=="__main__":
         parser.add_argument('--loss_function', type=str, default='MSELoss', help='Loss function')
         
         parser.add_argument('--hyperparameters_folder', type=str, default='hyperparameters/hyperparameters.json', help='Hyperparameters Folder')
-        parser.add_argument('--chechpoint_folder', type=str, default='checkpoints', help='Chechpoint Folder')
+        parser.add_argument('--checkpoint_folder', type=str, default='checkpoints', help='Checkpoint Folder')
         parser.add_argument('--log_folder', type=str, default='bookkeeping/log_folder', help='log folder')
 
 
@@ -76,7 +76,7 @@ if __name__=="__main__":
         'replace_target_iter': args.replace_target_iter,
         'optimizer': args.optimizer,
         'loss_function': args.loss_function,
-        'chechpoint_folder':args.chechpoint_folder,
+        'checkpoint_folder':args.checkpoint_folder,
         'log_folder':args.log_folder
         }
 
