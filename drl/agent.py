@@ -8,6 +8,7 @@ import torch.nn.functional as f
 import numpy as np 
 
 from collections import deque
+import os 
 
 
 
@@ -84,10 +85,13 @@ class Agent():
                 optimizer,
                 loss_function,
                 device,
+                chechpoint_folder,
                 gamma=0.99,
                 epsilon=1,
                 epsilon_end=0.01,
                 local_action_probability = 0.5,
+                save_model_frequency = 1000,
+                read_checkpoint = True,
                 dueling=True):
       
     self.id = id
@@ -103,6 +107,9 @@ class Agent():
     self.learning_rate =learning_rate
     self.epsilon_end =epsilon_end
     self.local_action_probability =local_action_probability
+    self.chechpoint_folder= chechpoint_folder
+    self.save_model_frequency = save_model_frequency
+  
 
     self.batch_size = batch_size
     self.memory_size=  memory_size
@@ -127,7 +134,8 @@ class Agent():
                                         hidden_layers=self.hidden_layers,
                                         lstm_layers=self.lstm_layers,
                                         dueling=self.dueling).to(self.device)
-    
+    if read_checkpoint:
+      self.load_model()
     self.Q_target_network = copy.deepcopy(self.Q_eval_network).to(self.device)
 
 
@@ -143,7 +151,19 @@ class Agent():
     self.action_memory = np.zeros(self.memory_size,dtype=np.int64)
     self.terminal_memory= np.zeros(self.memory_size,dtype=bool)
 
-
+  def store_model(self):
+    torch.save(self.Q_eval_network, self.chechpoint_folder)
+    
+  def load_model(self):
+    try:
+      if os.path.isfile(self.chechpoint_folder):
+        self.Q_eval_network = torch.load(self.chechpoint_folder)
+        print('model weights loaded')
+      else:
+        print('weights folder not found')
+    except:
+      print('could not load model weights, check if the models are the same as the current run')
+          
   def store_transitions(self,state,lstm_state,action,reward,new_state,new_lstm_state,done):
     index = self.memory_counter % self.memory_size
     self.state_memory[index] =state
@@ -231,4 +251,6 @@ class Agent():
 
     self.epsilon = max(self.epsilon - self.epsilon_decrement, self.epsilon_end)
 
+    if self.learn_step_counter % self.save_model_frequency == 0 :
+      self.store_model()
     

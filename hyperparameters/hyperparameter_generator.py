@@ -17,7 +17,7 @@ if __name__=="__main__":
         parser.add_argument('--vertical_transmission_capacity', type=float, default=20, help='Vertical transmission capacity')
         
         
-        parser.add_argument('--episodes', type=int, default=1000, help='Number of episodes')
+        parser.add_argument('--episodes', type=int, default=3, help='Number of episodes')
         parser.add_argument('--number_of_servers', type=int, default=3, help='Number of servers')
         parser.add_argument('--cloud_computational_capacity', type=float, default=30, help='Cloud computational capacity')
 
@@ -44,6 +44,7 @@ if __name__=="__main__":
         parser.add_argument('--loss_function', type=str, default='MSELoss', help='Loss function')
         
         parser.add_argument('--hyperparameters_folder', type=str, default='hyperparameters/hyperparameters.json', help='Hyperparameters Folder')
+        parser.add_argument('--chechpoint_folder', type=str, default='checkpoints/agent_', help='Chechpoint Folder')
 
 
         
@@ -73,7 +74,8 @@ if __name__=="__main__":
         'lstm_time_step': args.lstm_time_step,
         'replace_target_iter': args.replace_target_iter,
         'optimizer': args.optimizer,
-        'loss_function': args.loss_function
+        'loss_function': args.loss_function,
+        'chechpoint_folder':args.chechpoint_folder
         }
 
 

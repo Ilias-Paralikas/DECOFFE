@@ -72,7 +72,8 @@ if __name__ =='__main__':
                     replace_target_iter = hyperparameters['replace_target_iter'],
                     loss_function = getattr(nn, hyperparameters['loss_function']),
                     optimizer = getattr(torch.optim, hyperparameters['optimizer']),
-                    device=device) 
+                    device=device,
+                    chechpoint_folder=hyperparameters['chechpoint_folder']+str(i)+'.pt') 
         for i in range(number_of_servers)]
     
 
