@@ -134,7 +134,7 @@ class Bookkeeper:
         
 
         linestyles = itertools.cycle(('-','--','-.',':'))
-        linewidth  =8
+        linewidth  =5
         size =30
         plt.figure(figsize=(size,size))
 
@@ -142,7 +142,7 @@ class Bookkeeper:
         
         plt.figure(figsize=(size,size))
         mean_score  = self.moving_average(metrics['total_score_history'])
-        plt.plot(mean_score,label='Mean score',linestyle=next(linestyles),linewidth=linewidth)
+        plt.plot(mean_score,label='Mean score',linestyle=next(linestyles),linewidth=3*linewidth)
         for agent_id in range(len(metrics['score_history'][0])):
             agent_score = [row[agent_id] for row in metrics['score_history']]
             agent_mean_score  = self.moving_average(agent_score)
@@ -157,7 +157,7 @@ class Bookkeeper:
         plt.figure(figsize=(size,size))
         mean_drop_ratio  = self.moving_average(metrics['total_drop_ratio_history'])
 
-        plt.plot(mean_drop_ratio,label='Total drop ratio',linestyle=next(linestyles),linewidth=linewidth)
+        plt.plot(mean_drop_ratio,label='Total drop ratio',linestyle=next(linestyles),linewidth=3*linewidth)
         for agent_id in range(len(metrics['drop_ratio_history'][0])):
             agent_drop_rate = [row[agent_id] for row in metrics['drop_ratio_history']]
             mean_agent_drop_rate = self.moving_average(agent_drop_rate)
