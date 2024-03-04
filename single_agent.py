@@ -32,6 +32,7 @@ def main():
     os.makedirs(hyperparameters['checkpoint_folder'],exist_ok=True)
     
     log_folder = hyperparameters['log_folder']
+    hyperparameters['single_agnet'] = 'single agent'
     bookkeeper = Bookkeeper(log_folder,hyperparameters,device)
     
  
