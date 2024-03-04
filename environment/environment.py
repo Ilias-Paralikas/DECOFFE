@@ -172,5 +172,6 @@ class Environment:
         info['total_tasks_arrived']=np.count_nonzero(self.bitarrive)
         info['tasks_dropped'] = -np.ceil(rewards)
         info['total_tasks_dropped'] = np.sum(info['tasks_dropped'])
+        info['actions_chosen'] = actions
 
         return observations, rewards, done, info

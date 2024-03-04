@@ -154,10 +154,12 @@ class Agent():
   def store_model(self):
     torch.save(self.Q_eval_network, self.checkpoint_folder)
     
-  def load_model(self):
+  def load_model(self,checkpoint_folder=None):
+    if not checkpoint_folder:
+      checkpoint_folder = self.checkpoint_folder
     try:
-      if os.path.isfile(self.checkpoint_folder):
-        self.Q_eval_network = torch.load(self.checkpoint_folder)
+      if os.path.isfile(checkpoint_folder):
+        self.Q_eval_network = torch.load(checkpoint_folder,map_location=self.device)
         print('model weights loaded')
       else:
         print('weights folder not found')
