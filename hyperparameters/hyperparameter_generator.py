@@ -47,7 +47,7 @@ if __name__=="__main__":
         parser.add_argument('--gamma', type=float, default=0.99, help='Learning rate')
         parser.add_argument('--epsilon_end', type=float, default=0.01, help='epsilon_end')
         parser.add_argument('--local_action_probability', type=float, default=0.5, help='local_action_probability')
-        parser.add_argument('--save_model_frequency', type=int, default=1000, help='save_model_frequency ')
+        parser.add_argument('--save_model_frequency', type=int, default=100, help='save_model_frequency ')
 
         parser.add_argument('--hyperparameters_folder', type=str, default='hyperparameters/hyperparameters.json', help='Hyperparameters Folder')
         parser.add_argument('--checkpoint_folder', type=str, default='checkpoints', help='Checkpoint Folder')
