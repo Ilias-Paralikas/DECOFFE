@@ -36,5 +36,5 @@ python DECOFFE/hyperparameters/hyperparameter_generator.py \
 Run the model
 ```
 python DECOFFE/main.py \
---hyperparameters_file DECOFFE/hyperparameters/hyperparameters.json 
+--hypermarameters_folder DECOFFE/hyperparameters/hyperparameters.json 
 ```

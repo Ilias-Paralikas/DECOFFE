@@ -49,7 +49,7 @@ if __name__=="__main__":
         parser.add_argument('--local_action_probability', type=float, default=0.5, help='local_action_probability')
         parser.add_argument('--save_model_frequency', type=int, default=100, help='save_model_frequency ')
 
-        parser.add_argument('--hyperparameters_folder', type=str, default='hyperparameters/hyperparameters.json', help='Hyperparameters Folder')
+        parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='Hyperparameters Folder')
         parser.add_argument('--checkpoint_folder', type=str, default='checkpoints', help='Checkpoint Folder')
         parser.add_argument('--log_folder', type=str, default='bookkeeping/log_folder', help='log folder')
 
@@ -107,6 +107,6 @@ if __name__=="__main__":
 
         json_object = json.dumps(hyperparameters,indent=4) ### this saves the array in .json format)
         
-        with open(args.hyperparameters_folder, "w") as outfile:
+        with open(args.hyperparameters_file, "w") as outfile:
                 outfile.write(json_object)
         

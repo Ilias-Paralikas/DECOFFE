@@ -20,14 +20,14 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')   
 
     parser = argparse.ArgumentParser(description='Script Configuration via Command Line')
-    parser.add_argument('--hypermarameters_folder', type=str, default='hyperparameters/hyperparameters.json', help='Hyperparameters File')
+    parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='Hyperparameters File')
 
     args = parser.parse_args()
-    hypermarameters_folder = args.hypermarameters_folder
+    hyperparameters_file = args.hyperparameters_file
     
-    if not os.path.isfile(hypermarameters_folder):
+    if not os.path.isfile(hyperparameters_file):
         os.system('python hyperparameters/hyperparameter_generator.py')
-    with open(hypermarameters_folder, 'r') as file:
+    with open(hyperparameters_file, 'r') as file:
         hyperparameters = json.load(file)
     
     
