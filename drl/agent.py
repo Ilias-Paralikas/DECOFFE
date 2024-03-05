@@ -86,11 +86,11 @@ class Agent():
                 loss_function,
                 device,
                 checkpoint_folder,
-                gamma=0.99,
-                epsilon=1,
-                epsilon_end=0.01,
-                local_action_probability = 0.5,
-                save_model_frequency = 100,
+                gamma,
+                epsilon,
+                epsilon_end,
+                local_action_probability,
+                save_model_frequency,
                 read_checkpoint = True,
                 dueling=True):
       
