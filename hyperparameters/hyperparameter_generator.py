@@ -15,9 +15,11 @@ if __name__=="__main__":
         parser.add_argument('--servers_public_queues_computational_capacities', type=float, default=5, help='Servers public queues computational capacities')
         parser.add_argument('--horizontal_transmission_capacity', type=float, default=10, help='Horizontal transmission capacity')
         parser.add_argument('--vertical_transmission_capacity', type=float, default=20, help='Vertical transmission capacity')
+        parser.add_argument('--single_agent', action="store_true", help='multiple or a single agent')
+        parser.add_argument('--validate', action="store_true", help='validate')
+
         
-        
-        parser.add_argument('--episodes', type=int, default=3, help='Number of episodes')
+        parser.add_argument('--episodes', type=int, default=5, help='Number of episodes')
         parser.add_argument('--number_of_servers', type=int, default=3, help='Number of servers')
         parser.add_argument('--cloud_computational_capacity', type=float, default=30, help='Cloud computational capacity')
 
@@ -42,7 +44,11 @@ if __name__=="__main__":
         parser.add_argument('--replace_target_iter', type=int, default=500, help='Replace target iteration')
         parser.add_argument('--optimizer', type=str, default='Adam', help='Optimizer')
         parser.add_argument('--loss_function', type=str, default='MSELoss', help='Loss function')
-        
+        parser.add_argument('--gamma', type=float, default=0.99, help='Learning rate')
+        parser.add_argument('--epsilon_end', type=float, default=0.01, help='epsilon_end')
+        parser.add_argument('--local_action_probability', type=float, default=0.5, help='local_action_probability')
+        parser.add_argument('--save_model_frequency', type=int, default=1000, help='save_model_frequency ')
+
         parser.add_argument('--hyperparameters_folder', type=str, default='hyperparameters/hyperparameters.json', help='Hyperparameters Folder')
         parser.add_argument('--checkpoint_folder', type=str, default='checkpoints', help='Checkpoint Folder')
         parser.add_argument('--log_folder', type=str, default='bookkeeping/log_folder', help='log folder')
@@ -50,6 +56,11 @@ if __name__=="__main__":
 
         
         args = parser.parse_args()
+        if args.validate:
+                epsilon = 0.0
+        else:
+                epsilon = 1.0
+                
 
         
         hidden_layers = comma_seperated_string_to_list(args.hidden_layers)
@@ -77,7 +88,14 @@ if __name__=="__main__":
         'optimizer': args.optimizer,
         'loss_function': args.loss_function,
         'checkpoint_folder':args.checkpoint_folder,
-        'log_folder':args.log_folder
+        'log_folder':args.log_folder,
+        'single_agent':args.single_agent,
+        'validate':args.validate,
+        'epsilon':epsilon,
+        'gamma':args.gamma,
+        'epsilon_end':args.epsilon_end,
+        'local_action_probability':args.local_action_probability,
+        'save_model_frequency' :args.save_model_frequency
         }
 
 
