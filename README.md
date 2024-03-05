@@ -11,7 +11,7 @@ cd DECOFFE
 ```
 3. Create a virtual environment:
 ```
-python3 -m venv venv
+python -m venv venv
 ```
 4. Activate the virtual environment:
 - On Windows:
@@ -28,13 +28,13 @@ pip install -r requirements.txt
 ```
 
 How to use
-Define the hyperparameters
+
+Run the model with the preset hyperparameters
 ```
-python DECOFFE/hyperparameters/hyperparameter_generator.py \
- --hyperparameters_folder DECOFFE/hyperparameters/hyperparameters.json \
+python main.py 
 ```
-Run the model
+
+If you want to modify the hyperparameters run
 ```
-python DECOFFE/main.py \
---hypermarameters_folder DECOFFE/hyperparameters/hyperparameters.json 
+python /hyperparameters/hyperparameter_generator.py --help
 ```

@@ -4,7 +4,6 @@ __pycache__/
 # Ignore specific file
 hyperparameters/hyperparameters.json
 test.py
-run_index.txt
 # Ignore everything in a specific folder
 bookkeeping/log_folder/
 .vscode/
