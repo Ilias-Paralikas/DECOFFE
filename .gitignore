@@ -8,4 +8,5 @@ run_index.txt
 # Ignore everything in a specific folder
 bookkeeping/log_folder/
 .vscode/
+venv/
 checkpoints/
