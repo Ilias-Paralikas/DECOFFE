@@ -1,6 +1,6 @@
 import argparse
 import json
-
+import os 
 NUMBER_OF_CLOUDS =1
 
 def comma_seperated_string_to_list(comma_seperated_String):
@@ -11,47 +11,47 @@ if __name__=="__main__":
         
         
 
-        parser.add_argument('--servers_private_queues_computational_capacities', type=float, default=2.5, help='Servers private queues computational capacities')
-        parser.add_argument('--servers_public_queues_computational_capacities', type=float, default=5, help='Servers public queues computational capacities')
-        parser.add_argument('--horizontal_transmission_capacity', type=float, default=10, help='Horizontal transmission capacity')
-        parser.add_argument('--vertical_transmission_capacity', type=float, default=20, help='Vertical transmission capacity')
-        parser.add_argument('--single_agent', action="store_true", help='multiple or a single agent')
-        parser.add_argument('--validate', action="store_true", help='validate')
+        parser.add_argument('--servers_private_queues_computational_capacities', type=float, default=2.5, help='Float')
+        parser.add_argument('--servers_public_queues_computational_capacities', type=float, default=5, help='Float')
+        parser.add_argument('--horizontal_transmission_capacity', type=float, default=10, help='Float')
+        parser.add_argument('--vertical_transmission_capacity', type=float, default=20, help='Float')
+        parser.add_argument('--single_agent', action="store_true", help='if set, a single agent will be trained and used for inference')
+        parser.add_argument('--validate', action="store_true", help='if set, we will only validate the models, without training')
 
         
-        parser.add_argument('--episodes', type=int, default=5, help='Number of episodes')
-        parser.add_argument('--number_of_servers', type=int, default=3, help='Number of servers')
-        parser.add_argument('--cloud_computational_capacity', type=float, default=30, help='Cloud computational capacity')
+        parser.add_argument('--episodes', type=int, default=5, help='Integer')
+        parser.add_argument('--number_of_servers', type=int, default=3, help='Integer')
+        parser.add_argument('--cloud_computational_capacity', type=float, default=30, help='Float')
 
         # More hyperparameters
-        parser.add_argument('--episode_time', type=int, default=100, help='Episode time')
-        parser.add_argument('--timeout_delay', type=int, default=10, help='Timeout delay')
-        parser.add_argument('--max_bit_arrive', type=float, default=5.0, help='Maximum bit arrive')
-        parser.add_argument('--min_bit_arrive', type=float, default=2.0, help='Minimum bit arrive')
-        parser.add_argument('--task_arrive_probability', type=float, default=0.4, help='Task arrive probability')
-        parser.add_argument('--delta_duration', type=float, default=0.1, help='Delta duration')
-        parser.add_argument('--task_drop_penalty_multiplier', type=int, default=4, help='Task drop penalty multiplier')
-        parser.add_argument('--task_computational_density', type=float, default=0.297, help='Task computational density')
+        parser.add_argument('--episode_time', type=int, default=100, help='Integer')
+        parser.add_argument('--timeout_delay', type=int, default=10, help='Integer')
+        parser.add_argument('--max_bit_arrive', type=float, default=5.0, help='Float')
+        parser.add_argument('--min_bit_arrive', type=float, default=2.0, help='Float')
+        parser.add_argument('--task_arrive_probability', type=float, default=0.4, help='Float between 0 and 1')
+        parser.add_argument('--delta_duration', type=float, default=0.1, help='Float')
+        parser.add_argument('--task_drop_penalty_multiplier', type=float, default=4, help='Float')
+        parser.add_argument('--task_computational_density', type=float, default=0.297, help='Float')
 
         # Neural network hyperparameters
-        parser.add_argument('--hidden_layers', type=str, default='100', help='Hidden layers sizes, comma-separated')
-        parser.add_argument('--lstm_layers', type=int, default=20, help='LSTM layers')
-        parser.add_argument('--epsilon_decrement', type=float, default=15e-6, help='Epsilon decrement')
-        parser.add_argument('--batch_size', type=int, default=64, help='Batch size')
-        parser.add_argument('--learning_rate', type=float, default=1e-4, help='Learning rate')
-        parser.add_argument('--memory_size', type=int, default=int(1e4), help='Memory size')
-        parser.add_argument('--lstm_time_step', type=int, default=10, help='LSTM time step')
-        parser.add_argument('--replace_target_iter', type=int, default=500, help='Replace target iteration')
-        parser.add_argument('--optimizer', type=str, default='Adam', help='Optimizer')
-        parser.add_argument('--loss_function', type=str, default='MSELoss', help='Loss function')
-        parser.add_argument('--gamma', type=float, default=0.99, help='Learning rate')
-        parser.add_argument('--epsilon_end', type=float, default=0.01, help='epsilon_end')
-        parser.add_argument('--local_action_probability', type=float, default=0.5, help='local_action_probability')
-        parser.add_argument('--save_model_frequency', type=int, default=100, help='save_model_frequency ')
+        parser.add_argument('--hidden_layers', type=str, default='100', help='comma-separated integers')
+        parser.add_argument('--lstm_layers', type=int, default=20, help='Integer')
+        parser.add_argument('--epsilon_decrement', type=float, default=15e-6, help='Float')
+        parser.add_argument('--batch_size', type=int, default=64, help='Integer')
+        parser.add_argument('--learning_rate', type=float, default=1e-4, help='Float')
+        parser.add_argument('--memory_size', type=int, default=int(1e4), help='Integer')
+        parser.add_argument('--lstm_time_step', type=int, default=10, help='Integer')
+        parser.add_argument('--replace_target_iter', type=int, default=500, help='Integer')
+        parser.add_argument('--optimizer', type=str, default='Adam', help='selected from https://pytorch.org/docs/stable/optim.html, provided as a string')
+        parser.add_argument('--loss_function', type=str, default='MSELoss', help='selected from https://pytorch.org/docs/stable/nn.html#loss-functions, provided as a string')
+        parser.add_argument('--gamma', type=float, default=0.99, help='Float')
+        parser.add_argument('--epsilon_end', type=float, default=0.01, help='float, between 0 and 1')
+        parser.add_argument('--local_action_probability', type=float, default=0.5, help='Float when picking random action, the probability of chosing local actions')
+        parser.add_argument('--save_model_frequency', type=int, default=100, help='Integer, How ofter should the models be saved')
 
-        parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='Hyperparameters Folder')
-        parser.add_argument('--checkpoint_folder', type=str, default='checkpoints', help='Checkpoint Folder')
-        parser.add_argument('--log_folder', type=str, default='bookkeeping/log_folder', help='log folder')
+        parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters.json', help='the file that the hyperparameters will be saved, for verison control')
+        parser.add_argument('--checkpoint_folder', type=str, default='checkpoints', help='String, will be created ')
+        parser.add_argument('--log_folder', type=str, default=os.path.join('bookkeeping','log_folder'), help='log folder, will be inside the bookkeeping folder')
 
 
         
@@ -64,7 +64,7 @@ if __name__=="__main__":
 
         
         hidden_layers = comma_seperated_string_to_list(args.hidden_layers)
-        
+        hyperparameters_file  =os.path.join('hyperparameters',args.hyperparameters_file)
         hyperparameters = {
         'episodes': args.episodes,
         'number_of_servers': args.number_of_servers,
@@ -107,6 +107,6 @@ if __name__=="__main__":
 
         json_object = json.dumps(hyperparameters,indent=4) ### this saves the array in .json format)
         
-        with open(args.hyperparameters_file, "w") as outfile:
+        with open(hyperparameters_file, "w") as outfile:
                 outfile.write(json_object)
         
