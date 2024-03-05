@@ -49,9 +49,9 @@ if __name__=="__main__":
         parser.add_argument('--local_action_probability', type=float, default=0.5, help='Float when picking random action, the probability of chosing local actions')
         parser.add_argument('--save_model_frequency', type=int, default=100, help='Integer, How ofter should the models be saved')
 
-        parser.add_argument('--hyperparameters_file', type=str, default=os.path.join('hyperparameters','hyperparameters.json'), help='the file that the hyperparameters will be saved, for verison control')
+        parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='the file that the hyperparameters will be saved, for verison control')
         parser.add_argument('--checkpoint_folder', type=str, default='checkpoints', help='String, will be created ')
-        parser.add_argument('--log_folder', type=str, default=os.path.join('bookkeeping','log_folder'), help='log folder, will be inside the bookkeeping folder')
+        parser.add_argument('--log_folder', type=str, default='bookkeeping/log_folder', help='log folder, will be inside the bookkeeping folder')
 
 
         

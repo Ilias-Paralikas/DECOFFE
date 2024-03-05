@@ -105,6 +105,7 @@ def main():
                                                 new_state=local_observations_[i],
                                                 new_lstm_state=new_lstm_input,
                                                 done=done)
+                    agents.learn()
                     
             local_observations,active_queues  = local_observations_,active_queues_
         
