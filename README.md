@@ -36,5 +36,8 @@ python main.py
 
 If you want to modify the hyperparameters run
 ```
-python /hyperparameters/hyperparameter_generator.py --help
+python hyperparameters/hyperparameter_generator.py --help
 ```
+
+Note 
+all paths are relative to ```main.py```
