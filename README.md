@@ -1,7 +1,6 @@
 # DECOFFE
 
-how to use 
-
+Installation 
 1. Clone the repository:
 ```
 git clone https://github.com/Ilias-Paralikas/DECOFFE.git
@@ -26,4 +25,16 @@ python3 -m venv venv
 5. Install the requirements:
 ```
 pip install -r requirements.txt
+```
+
+How to use
+Define the hyperparameters
+```
+python DECOFFE/hyperparameters/hyperparameter_generator.py \
+ --hyperparameters_folder DECOFFE/hyperparameters/hyperparameters.json \
+```
+Run the model
+```
+python DECOFFE/main.py \
+--hyperparameters_file DECOFFE/hyperparameters/hyperparameters.json 
 ```
