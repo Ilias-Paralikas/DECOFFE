@@ -15,7 +15,6 @@ if __name__=="__main__":
         parser.add_argument('--servers_public_queues_computational_capacities', type=float, default=5, help='Float')
         parser.add_argument('--horizontal_transmission_capacity', type=float, default=10, help='Float')
         parser.add_argument('--vertical_transmission_capacity', type=float, default=20, help='Float')
-        parser.add_argument('--single_agent', action="store_true", help='if set, a single agent will be trained and used for inference')
         parser.add_argument('--validate', action="store_true", help='if set, we will only validate the models, without training')
 
         
@@ -88,7 +87,6 @@ if __name__=="__main__":
         'loss_function': args.loss_function,
         'checkpoint_folder':args.checkpoint_folder,
         'log_folder':args.log_folder,
-        'single_agent':args.single_agent,
         'validate':args.validate,
         'epsilon':epsilon,
         'gamma':args.gamma,

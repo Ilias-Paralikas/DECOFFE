@@ -1,7 +1,7 @@
 
 
 from environment.environment import Environment
-from drl.multiagentwrapper import MultiAgentWrapper
+from drl.agent import Agent
 from bookkeeping.bookkeeper import Bookkeeper
 import numpy as np
 
@@ -58,9 +58,7 @@ def main():
     
     state_dimensions,lstm_shape,number_of_actions = environment.get_agent_variables()
 
-    
-    agents = MultiAgentWrapper(
-                    number_of_servers=number_of_servers,
+    agents = [Agent(id =i,
                     state_dimensions=state_dimensions,
                     lstm_shape=lstm_shape,
                     number_of_actions=number_of_actions,
@@ -72,16 +70,17 @@ def main():
                     memory_size = hyperparameters['memory_size'],
                     lstm_time_step = hyperparameters['lstm_time_step'],
                     replace_target_iter = hyperparameters['replace_target_iter'],
-                    loss_function =  hyperparameters['loss_function'],
-                    optimizer = hyperparameters['optimizer'],
+                    loss_function = getattr(torch.nn, hyperparameters['loss_function']),
+                    optimizer = getattr(torch.optim, hyperparameters['optimizer']),
                     device=device,
-                    checkpoint_folder = hyperparameters['checkpoint_folder'],
+                    checkpoint_folder = hyperparameters['checkpoint_folder']+'/agent_'+str(i)+'.pt' ,
                     gamma = hyperparameters['gamma'],
                     epsilon_end = hyperparameters['epsilon_end'],
                     local_action_probability = hyperparameters['local_action_probability'],
                     save_model_frequency = hyperparameters['save_model_frequency'],
-                    single_agent=hyperparameters['single_agent'],
-                    epsilon=hyperparameters['epsilon'])  
+                    epsilon=hyperparameters['epsilon'])
+            for i in range(number_of_servers)]
+
 
     for episode in range(episodes):
         done = False
@@ -92,24 +91,24 @@ def main():
             actions = np.zeros(number_of_servers,dtype=np.int8)
             for i in range(number_of_servers):
                 lstm_input = remove_id_from_list(active_queues,i)
-                actions[i] = agents.choose_action(local_observations[i],lstm_input)
+                actions[i] = agents[i].choose_action(local_observations[i],lstm_input)
             (local_observations_,active_queues_), rewards, done, info = environment.step(actions)
             bookkeeper.add_time_step(rewards,info)
             if not hyperparameters['validate']:
                 for i in range(number_of_servers):
                     new_lstm_input = remove_id_from_list(active_queues_,i)
-                    agents.store_transitions(state = local_observations[i],
+                    agents[i].store_transitions(state = local_observations[i],
                                                 lstm_state=lstm_input,
                                                 action = actions[i],
                                                 reward= rewards[i],
                                                 new_state=local_observations_[i],
                                                 new_lstm_state=new_lstm_input,
                                                 done=done)
-                    agents.learn()
+                    agents[i].learn()
                     
             local_observations,active_queues  = local_observations_,active_queues_
         
-        epsilon = agents.get_espilon()
+        epsilon = agents[0].epsilon
         score,average_score,drop_ratio =bookkeeper.store_episode(epsilon)
 
         print('Episode: {}\tScore: {:.3f}\t Average Score: {:.3f}\tDrop Ratio: {:.3f}\tEpsilon: {:.3f}'.format(episode,score,average_score,drop_ratio ,epsilon))
