@@ -244,10 +244,11 @@ class Agent():
     
     next_actions = torch.argmax(self.Q_eval_network(next_state_batch, next_lstm_sequence_batch), dim=1)
     q_target_next = q_next.gather(1, next_actions.unsqueeze(1)).squeeze(1)
-    q_target_next[terminal_batch] = 0  
+    mask = ~terminal_batch
+    q_target_next = q_target_next * mask
     q_target = reward_batch + self.gamma * q_target_next
 
-    loss = self.loss_function(q_eval, q_target)
+    loss = self.loss_function(q_target,q_eval)
     loss.backward()
     self.optimizer.step()
 
