@@ -17,27 +17,44 @@ def remove_id_from_list(lst, server_id):
 
 
 def main():
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')   
-
-    parser = argparse.ArgumentParser(description='Script Configuration via Command Line')
-    parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='Hyperparameters File')
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  
+    parser = argparse.ArgumentParser(description="Process some integers.")
+ 
+    parser.add_argument('--resume_run', type=str, nargs='?', default=None, help='an optional string')
+    parser.add_argument('--episodes', type=int, default=100, help='Integer')
+    parser.add_argument('--average_window', type=int,   default=300, help='anerage ploting window')
+    parser.add_argument('--log_folder' ,type=str,default='bookkeeping/log_folder',help='where the runs will be stored')
 
     args = parser.parse_args()
-    hyperparameters_file = args.hyperparameters_file
+    resume_run = args.resume_run
+    if resume_run:
+        try:
+            bookkeeper  =Bookkeeper(resume_run=resume_run,
+                                    average_window=args.average_window,
+                                    log_folder=args.log_folder)
+        except:
+            print('The run you are trying to resume does not exist')
+            return
+        hyperparameters_file,checkpoint_folder = bookkeeper.get_folder_names()
+        with open(hyperparameters_file, 'r') as file:
+            hyperparameters = json.load(file)
+        hyperparameters['epsilon'] = bookkeeper.get_epsilon()
+        hyperparameters['episodes'] = args.episodes
+    else:
+        hyperparameters_file = 'hyperparameters/hyperparameters.json'
+        if not os.path.isfile(hyperparameters_file):
+            os.system('python hyperparameters/hyperparameter_generator.py')
+        with open(hyperparameters_file, 'r') as file:
+            hyperparameters = json.load(file)
+        bookkeeper  =Bookkeeper(resume_run=resume_run,
+                                hyperparameters=hyperparameters,
+                                average_window=args.average_window,
+                                log_folder=args.log_folder)
+        hyperparameters_file,checkpoint_folder = bookkeeper.get_folder_names()
+
     
-    if not os.path.isfile(hyperparameters_file):
-        os.system('python hyperparameters/hyperparameter_generator.py')
-    with open(hyperparameters_file, 'r') as file:
-        hyperparameters = json.load(file)
     
     
-    os.makedirs(hyperparameters['checkpoint_folder'],exist_ok=True)
-    
-    log_folder = hyperparameters['log_folder']
-    bookkeeper = Bookkeeper(log_folder,hyperparameters,device)
-    
- 
-        
     episodes  =hyperparameters['episodes']
     number_of_servers = hyperparameters['number_of_servers']
     environment = Environment(
@@ -73,7 +90,7 @@ def main():
                     loss_function = getattr(torch.nn, hyperparameters['loss_function']),
                     optimizer = getattr(torch.optim, hyperparameters['optimizer']),
                     device=device,
-                    checkpoint_folder = hyperparameters['checkpoint_folder']+'/agent_'+str(i)+'.pt' ,
+                    checkpoint_folder =checkpoint_folder+'/agent_'+str(i)+'.pt' ,
                     gamma = hyperparameters['gamma'],
                     epsilon_end = hyperparameters['epsilon_end'],
                     local_action_probability = hyperparameters['local_action_probability'],
@@ -93,7 +110,7 @@ def main():
                 lstm_input = remove_id_from_list(active_queues,i)
                 actions[i] = agents[i].choose_action(local_observations[i],lstm_input)
             (local_observations_,active_queues_), rewards, done, info = environment.step(actions)
-            bookkeeper.add_time_step(rewards,info)
+            bookkeeper.store_timestep(info)
             if not hyperparameters['validate']:
                 for i in range(number_of_servers):
                     new_lstm_input = remove_id_from_list(active_queues_,i)
@@ -105,18 +122,13 @@ def main():
                                                 new_lstm_state=new_lstm_input,
                                                 done=done)
                     agents[i].learn()
+            
+                    
                     
             local_observations,active_queues  = local_observations_,active_queues_
-        
-        epsilon = agents[0].epsilon
-        score,average_score,drop_ratio =bookkeeper.store_episode(epsilon)
+        bookkeeper.reset_episode(episode,agents[0].epsilon)
 
-        print('Episode: {}\tScore: {:.3f}\t Average Score: {:.3f}\tDrop Ratio: {:.3f}\tEpsilon: {:.3f}'.format(episode,score,average_score,drop_ratio ,epsilon))
-
-    bookkeeper.store_run()
+    bookkeeper.plot_metrics()
     
-    
-
-
 if __name__ =='__main__':
     main()

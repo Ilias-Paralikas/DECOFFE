@@ -35,9 +35,9 @@ if __name__=="__main__":
         # Neural network hyperparameters
         parser.add_argument('--hidden_layers', type=str, default='100', help='comma-separated integers')
         parser.add_argument('--lstm_layers', type=int, default=20, help='Integer')
-        parser.add_argument('--epsilon_decrement', type=float, default=15e-6, help='Float')
+        parser.add_argument('--epsilon_decrement', type=float, default=1e-6, help='Float')
         parser.add_argument('--batch_size', type=int, default=64, help='Integer')
-        parser.add_argument('--learning_rate', type=float, default=1e-4, help='Float')
+        parser.add_argument('--learning_rate', type=float, default=1e-7, help='Float')
         parser.add_argument('--memory_size', type=int, default=int(1e4), help='Integer')
         parser.add_argument('--lstm_time_step', type=int, default=10, help='Integer')
         parser.add_argument('--replace_target_iter', type=int, default=500, help='Integer')
@@ -49,11 +49,7 @@ if __name__=="__main__":
         parser.add_argument('--save_model_frequency', type=int, default=100, help='Integer, How ofter should the models be saved')
 
         parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='the file that the hyperparameters will be saved, for verison control')
-        parser.add_argument('--checkpoint_folder', type=str, default='checkpoints', help='String, will be created ')
-        parser.add_argument('--log_folder', type=str, default='bookkeeping/log_folder', help='log folder, will be inside the bookkeeping folder')
-
-
-        
+        parser.add_argument('--log_folder' ,type=str,default='bookkeeping/log_folder',help='where the runs will be stored')
         args = parser.parse_args()
         if args.validate:
                 epsilon = 0.0
@@ -85,14 +81,12 @@ if __name__=="__main__":
         'replace_target_iter': args.replace_target_iter,
         'optimizer': args.optimizer,
         'loss_function': args.loss_function,
-        'checkpoint_folder':args.checkpoint_folder,
-        'log_folder':args.log_folder,
         'validate':args.validate,
         'epsilon':epsilon,
         'gamma':args.gamma,
         'epsilon_end':args.epsilon_end,
         'local_action_probability':args.local_action_probability,
-        'save_model_frequency' :args.save_model_frequency
+        'save_model_frequency' :args.save_model_frequency,        
         }
 
 

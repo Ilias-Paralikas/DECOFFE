@@ -1,177 +1,154 @@
-import numpy as np 
-import os
+import os 
 import pickle
+import numpy as np
 import matplotlib.pyplot as plt
-import itertools
 import json
 class Bookkeeper:
-    def __init__(self,log_folder,hyperparameters,device='cpu',average_window = 100):
-        self.reset_episode()
-        self.total_score_history =[]
-        self.score_history =[]
-        
-        self.total_drop_ratio_history =[]
-        self.drop_ratio_history =[]
-        self.epsilon_history =[]
-        
-        self.hyperparameters =hyperparameters
-        self.log_folder = log_folder
+    def __init__(self,
+                 resume_run,
+                 average_window,
+                 log_folder,
+                 hyperparameters=None):
         self.average_window=average_window
-        
-        os.makedirs(log_folder, exist_ok=True)
-        print(device)
-        for key in hyperparameters:
-            print(key," : ",hyperparameters[key])
-    
+        os.makedirs(log_folder,exist_ok=True)
+        if resume_run:
+            self.run_folder = log_folder+'/'+resume_run
+            self.hyperparameters_file = self.run_folder+'/hyperparameters.json'
 
-    def moving_average(self,lst):
-        averages = []
-        for i in range(len(lst)):
-            if i < self.average_window:
-                averages.append(sum(lst[:i+1]) / (i+1))
+        else:
+            index_filepath  =log_folder+'/index.txt'
+            if not os.path.exists(index_filepath):
+                with open(index_filepath, 'w') as file:
+                    file.write('0')
+                    run_index = 0
             else:
-                averages.append(sum(lst[i-self.average_window+1:i+1]) / self.average_window)
-        return averages
-
-        
-
-        
-    def store_episode(self,epsilon):
-        self.epsilon_history.append(epsilon)
-        self.total_score_history.append(self.total_step_score)
-        self.score_history.append(self.step_score)
-        
-        total_episode_drop_ratio = self.total_step_tasks_dropped/self.total_step_tasks_arrived 
-        self.total_drop_ratio_history.append(total_episode_drop_ratio)
-        
-        episode_drop_ratio =  self.step_tasks_dropped/self.step_tasks_arrived 
-        self.drop_ratio_history.append(episode_drop_ratio)
-        
-        
-        average_score = np.mean(self.total_score_history[-self.average_window:])
-        
-        episode_metrics = {}
-        episode_metrics['score'] = self.total_step_score
-        episode_metrics['avergae_score']  = average_score
-        episode_metrics['drop_ratio'] = total_episode_drop_ratio
-
-        self.reset_episode()
-        
-        return episode_metrics['score'],episode_metrics['avergae_score'],episode_metrics['drop_ratio'] 
-
-    def reset_episode(self):
-        self.total_step_score=0
-        self.step_score = []
-        
-        self.total_step_tasks_arrived = 0
-        self.step_tasks_arrived = []
-        
-        self.total_step_tasks_dropped = 0
-        self.step_tasks_dropped = []
-
+                with open(index_filepath, 'r') as file:
+                    run_index = int(file.read().strip())
+                run_index += 1
+                with open(index_filepath, 'w') as file:
+                    file.write(str(run_index))
+            self.run_folder = log_folder+'/run_'+str(run_index)
+            os.makedirs(self.run_folder,exist_ok=True)
     
-    def add_time_step(self,rewards,info):
-        self.total_step_score += np.mean(rewards)
-        if len(self.step_score)==0:
-            self.step_score =rewards
-        else:
-            self.step_score += rewards
-            
-        self.total_step_tasks_arrived += info['total_tasks_arrived']
-        if len(self.step_tasks_arrived)==0:
-            self.step_tasks_arrived = info['tasks_arrived']
-        else:
-            self.step_tasks_arrived += info['tasks_arrived']
-            
-        self.total_step_tasks_dropped += info['total_tasks_dropped']
-        if len(self.step_tasks_dropped)==0:
-            self.step_tasks_dropped = info['tasks_dropped']
-        else:  
-            self.step_tasks_dropped += info['tasks_dropped']
-
+            self.hyperparameters_file = self.run_folder+'/hyperparameters.json'
+            json_object = json.dumps(hyperparameters,indent=4) ### this saves the array in .json format)
+            with open(self.hyperparameters_file, "w") as outfile:
+                    outfile.write(json_object)
         
-
+        self.checkpoint_folder = self.run_folder+'/checkpoints'
+        self.metrics_folder = self.run_folder+'/metrics.pkl'
         
-    def store_run(self,index_filepath = 'run_index.txt'):
-        metrics ={}
-        metrics['total_score_history'] =self.total_score_history
-        metrics['score_history']= self.score_history
-        metrics['total_drop_ratio_history'] = self.total_drop_ratio_history
-        metrics['drop_ratio_history'] = self.drop_ratio_history
-        metrics['epsilon_history']  =self.epsilon_history
-        
-        run_details ={}
-        run_details['hyperparameters'] =self.hyperparameters
-        run_details['metrics'] =metrics
-        
-        index_filepath  = self.log_folder +'/' +index_filepath
-        if not os.path.exists(index_filepath):
-            with open(index_filepath, 'w') as file:
-                file.write('0')
-                run_index = 0
-        else:
-            with open(index_filepath, 'r') as file:
-                run_index = int(file.read().strip())
-            run_index += 1
-            with open(index_filepath, 'w') as file:
-                file.write(str(run_index))
-
-        run_folder=  self.log_folder+'/run_'+str(run_index)
-        os.mkdir(run_folder)
                 
-        filename = run_folder+'/hyperparameters.json'
+        if resume_run:
+            with open(self.metrics_folder, 'rb') as f:
+                self.metrics = pickle.load(f)
+        else:
+            self.metrics ={}
+            self.metrics['task_drop_ratio_history'] =[]
+            self.metrics['rewards_history'] =[]
+            self.metrics['epsilon_history'] =[1.0]
 
-            
-        json_object = json.dumps(self.hyperparameters,indent=4) ### this saves the array in .json format)
-        
-        with open(filename, "w") as outfile:
-                outfile.write(json_object)
-        
-                        
-        with open(run_folder+'/details.pickle', 'wb') as handle:
-            pickle.dump(run_details, handle, protocol=pickle.HIGHEST_PROTOCOL)
-            
-        
-
-        linestyles = itertools.cycle(('-','--','-.',':'))
-        linewidth  =5
-        size =30
-        plt.figure(figsize=(size,size))
-
-        
-        
-        plt.figure(figsize=(size,size))
-        mean_score  = self.moving_average(metrics['total_score_history'])
-        plt.plot(mean_score,label='Mean score',linestyle=next(linestyles),linewidth=3*linewidth)
-        for agent_id in range(len(metrics['score_history'][0])):
-            agent_score = [row[agent_id] for row in metrics['score_history']]
-            agent_mean_score  = self.moving_average(agent_score)
-            plt.plot(agent_mean_score,label='agent '+str(agent_id) + 'score',linestyle=next(linestyles),linewidth=linewidth)
-        plt.legend()
-        plt.savefig(run_folder+'/mean_score_history')
-        plt.close()
-        
-
-        linestyles = itertools.cycle(('-','--','-.',':'))
-        
-        plt.figure(figsize=(size,size))
-        mean_drop_ratio  = self.moving_average(metrics['total_drop_ratio_history'])
-
-        plt.plot(mean_drop_ratio,label='Total drop ratio',linestyle=next(linestyles),linewidth=3*linewidth)
-        for agent_id in range(len(metrics['drop_ratio_history'][0])):
-            agent_drop_rate = [row[agent_id] for row in metrics['drop_ratio_history']]
-            mean_agent_drop_rate = self.moving_average(agent_drop_rate)
-            plt.plot(mean_agent_drop_rate,label='agent '+str(agent_id) + ' drop ratio',linestyle=next(linestyles),linewidth=linewidth)
-        plt.legend()
-        plt.savefig(run_folder+'/mean_drop_ratio_history')
-        plt.close()
-
-     
     
+        self.tasks_arrived = []
+        self.tasks_dropped =[]        
+        self.rewards = []
+        
+        os.makedirs(self.checkpoint_folder,exist_ok=True)
 
-        plt.figure(figsize=(size,size))
-        plt.plot(self.epsilon_history,label='epsilon',linewidth=linewidth)
-        plt.legend()
-        plt.savefig(run_folder+'/epsilon_history')
-        plt.close()
+    def reset_episode(self,episode,epsilon):
+        episode_tasks_arrived = np.vstack(self.tasks_arrived)
+        episode_tasks_arrived = np.sum(episode_tasks_arrived,axis=0)
+        episode_tasks_drop = np.vstack(self.tasks_dropped)
+        episode_tasks_drop = np.sum(episode_tasks_drop,axis=0)
+        episode_task_drop_ratio = episode_tasks_drop/episode_tasks_arrived
+        self.metrics['task_drop_ratio_history'].append(episode_task_drop_ratio)
+        
+        episode_rewards = np.vstack(self.rewards)
+        episode_rewards=  np.sum(episode_rewards,axis=0)
+        self.metrics['rewards_history'].append(episode_rewards)
+          
+        self.metrics['epsilon_history'].append(epsilon)
+        
+                
+        with open(self.metrics_folder, 'wb') as f:
+            pickle.dump(self.metrics, f)
+            
+        self.tasks_arrived = []
+        self.tasks_dropped =[]
+        self.rewards = []
+        score, average_score,drop_ratio,epsilon = np.mean(self.metrics['rewards_history'][-1]), np.mean(self.metrics['rewards_history'][-self.average_window:]),np.mean(self.metrics['task_drop_ratio_history'][-1]),self.metrics['epsilon_history'][-1]
+        print('Episode: {}\tScore: {:.3f}\t Average Score: {:.3f}\tDrop Ratio: {:.3f}\tEpsilon: {:.3f}'.format(episode,score,average_score,drop_ratio ,epsilon))
+    def store_timestep(self,info):
+        self.tasks_arrived.append(info['tasks_arrived'])
+        self.tasks_dropped.append(info['tasks_dropped'])
+        self.rewards.append(info['rewards'])
+            
+        
+
+
+
+    def get_folder_names(self):
+        return self.hyperparameters_file,self.checkpoint_folder
+    def get_epsilon(self):
+        return self.metrics['epsilon_history'][-1]
     
+    
+    def plot_and_save(self, key):
+        if key not in self.metrics:
+            print(f"No data found for key '{key}'")
+            return
+        list_of_arrays = self.metrics[key]
+        stacked_arrays = np.vstack(list_of_arrays)
+
+        transposed_arrays = stacked_arrays.T
+        plt.figure(figsize=(10, 6))
+        for i, column in enumerate(transposed_arrays):
+            plt.plot(column, label=f'agent {i+1} {key} ', linestyle='--')
+        mean_values = np.mean(transposed_arrays, axis=0)
+        plt.plot(mean_values, label='Mean', color='red', linewidth=6)
+        plt.legend()
+        plt.title(f'Plot of {key} and Their Mean')
+
+        plt.savefig(f'{self.run_folder}/{key}.png')
+
+    def moving_average(self, a):
+        return  [np.mean(a[max(0,i-self.average_window):i]) for i in range(1,len(a))]
+
+        
+    def plot_and_save_moving_avg(self, key):
+        if key not in self.metrics:
+            print(f"No data found for key '{key}'")
+            return
+
+        list_of_arrays = self.metrics[key]
+
+        stacked_arrays = np.vstack(list_of_arrays)
+
+        transposed_arrays = stacked_arrays.T
+
+        # Create a new figure
+        plt.figure(figsize=(10, 6))
+
+        # Plot the moving average of each column
+        means = []  # List to store the means of the moving averages
+        for i, column in enumerate(transposed_arrays):
+            moving_avg = self.moving_average(column)  # Change n to your desired window size
+            plt.plot(moving_avg, label=f'agent {i+1}', linestyle='--')
+            means.append(moving_avg)
+        means = np.mean(means, axis=0)
+        # Plot the mean of the moving averages
+        plt.plot(means, label='Mean', color='red',linewidth=6)
+
+        # Add a legend and title
+        plt.legend()
+        plt.title(f'Plot of Moving Average of {key}')
+
+        # Save the plot as a PNG file
+        plt.savefig(f'{self.run_folder}/{key}_moving_average.png')
+        plt.close()
+        
+    def plot_metrics(self):
+        for key in self.metrics.keys():
+            self.plot_and_save(key)
+            self.plot_and_save_moving_avg(key)
+        
