@@ -42,7 +42,7 @@ def main():
         hyperparameters['epsilon'] = bookkeeper.get_epsilon()
         hyperparameters['episodes'] = args.episodes
     else:
-        hyperparameters_file = 'hyperparameters/hyperparameters.json'
+        hyperparameters_file = args.hyperparameters_file
         if not os.path.isfile(hyperparameters_file):
             os.system('python hyperparameters/hyperparameter_generator.py')
         with open(hyperparameters_file, 'r') as file:
