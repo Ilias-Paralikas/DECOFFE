@@ -18,7 +18,7 @@ def remove_id_from_list(lst, server_id):
 
 def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  
-    print('device')
+    print(device)
     parser = argparse.ArgumentParser(description="Process some integers.")
  
     parser.add_argument('--resume_run', type=str, nargs='?', default=None, help='an optional string')
