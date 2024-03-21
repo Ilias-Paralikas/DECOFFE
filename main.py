@@ -24,6 +24,7 @@ def main():
     parser.add_argument('--episodes', type=int, default=100, help='Integer')
     parser.add_argument('--average_window', type=int,   default=300, help='anerage ploting window')
     parser.add_argument('--log_folder' ,type=str,default='bookkeeping/log_folder',help='where the runs will be stored')
+    parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='the file that the hyperparameters will be saved, for verison control')
 
     args = parser.parse_args()
     resume_run = args.resume_run
