@@ -21,12 +21,12 @@ def main():
     print(device)
     parser = argparse.ArgumentParser(description="Process some integers.")
  
-    parser.add_argument('--resume_run', type=str, nargs='?', default=None, help='an optional string')
-    parser.add_argument('--episodes', type=int, default=1, help='Integer')
+    parser.add_argument('--resume_run', type=str, nargs='?', default='run_0', help='an optional string')
+    parser.add_argument('--episodes', type=int, default=1000, help='Integer')
     parser.add_argument('--average_window', type=int,   default=500, help='anerage ploting window')
     parser.add_argument('--log_folder' ,type=str,default='bookkeeping/log_folder',help='where the runs will be stored')
     parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='the file that the hyperparameters will be saved, for verison control')
-
+    parser.add_argument('--static',type=int, default=0, help='if the environment is static or not')
     args = parser.parse_args()
     resume_run = args.resume_run
     if resume_run:
@@ -103,7 +103,9 @@ def main():
 
 
     for episode in range(episodes):
-        np.random.seed(0)
+        if args.static:
+            if episode % args.static == 0:
+                np.random.seed(0)
         done = False
         local_observations,active_queues = environment.reset()
         
