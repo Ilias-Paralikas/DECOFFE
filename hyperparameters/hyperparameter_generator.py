@@ -49,7 +49,6 @@ if __name__=="__main__":
         parser.add_argument('--save_model_frequency', type=int, default=100, help='Integer, How ofter should the models be saved')
 
         parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='the file that the hyperparameters will be saved, for verison control')
-        parser.add_argument('--log_folder' ,type=str,default='bookkeeping/log_folder',help='where the runs will be stored')
         args = parser.parse_args()
         if args.validate:
                 epsilon = 0.0

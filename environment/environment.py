@@ -171,5 +171,7 @@ class Environment:
         info['tasks_arrived'] = np.where(self.bitarrive==0,0,1)
         info['tasks_dropped'] = -np.ceil(rewards)
         info['rewards'] = rewards
+        info['actions'] = actions
+        info['bitarrive'] = self.bitarrive
 
         return observations, rewards, done, info

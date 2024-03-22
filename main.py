@@ -21,9 +21,9 @@ def main():
     print(device)
     parser = argparse.ArgumentParser(description="Process some integers.")
  
-    parser.add_argument('--resume_run', type=str, nargs='?', default=None, help='an optional string')
-    parser.add_argument('--episodes', type=int, default=100, help='Integer')
-    parser.add_argument('--average_window', type=int,   default=300, help='anerage ploting window')
+    parser.add_argument('--resume_run', type=str, nargs='?', default='run_0', help='an optional string')
+    parser.add_argument('--episodes', type=int, default=1, help='Integer')
+    parser.add_argument('--average_window', type=int,   default=500, help='anerage ploting window')
     parser.add_argument('--log_folder' ,type=str,default='bookkeeping/log_folder',help='where the runs will be stored')
     parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='the file that the hyperparameters will be saved, for verison control')
 

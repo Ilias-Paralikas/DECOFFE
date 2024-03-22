@@ -52,6 +52,7 @@ class Bookkeeper:
         self.tasks_arrived = []
         self.tasks_dropped =[]        
         self.rewards = []
+        self.actions = []
         
         os.makedirs(self.checkpoint_folder,exist_ok=True)
 
@@ -76,12 +77,16 @@ class Bookkeeper:
         self.tasks_arrived = []
         self.tasks_dropped =[]
         self.rewards = []
+        self.last_actions = self.actions
+        self.actions = []
         score, average_score,drop_ratio,epsilon = np.mean(self.metrics['rewards_history'][-1]), np.mean(self.metrics['rewards_history'][-self.average_window:]),np.mean(self.metrics['task_drop_ratio_history'][-1]),self.metrics['epsilon_history'][-1]
         print('Episode: {}\tScore: {:.3f}\t Average Score: {:.3f}\tDrop Ratio: {:.3f}\tEpsilon: {:.3f}'.format(episode,score,average_score,drop_ratio ,epsilon))
     def store_timestep(self,info):
         self.tasks_arrived.append(info['tasks_arrived'])
         self.tasks_dropped.append(info['tasks_dropped'])
         self.rewards.append(info['rewards'])
+        valid_actions  =  [info['actions'][i] if info['bitarrive'][i] !=0 else -1 for i in range(len(info['bitarrive']))]
+        self.actions.append(valid_actions)
             
         
 
@@ -91,6 +96,14 @@ class Bookkeeper:
         return self.hyperparameters_file,self.checkpoint_folder
     def get_epsilon(self):
         return self.metrics['epsilon_history'][-1]
+    def plot_actions(self):
+        actions = np.concatenate(self.last_actions)
+        actions = [num for num in actions if num != -1]
+        counts = np.bincount(actions)
+        plt.bar(range(len(counts)), counts)
+        plt.title(f'actions chosen by agents')
+
+        plt.savefig(f'{self.run_folder}/actions.png')
     
     
     def plot_and_save(self, key):
@@ -110,6 +123,7 @@ class Bookkeeper:
         plt.title(f'Plot of {key} and Their Mean')
 
         plt.savefig(f'{self.run_folder}/{key}.png')
+        plt.close()
 
     def moving_average(self, a):
         return  [np.mean(a[max(0,i-self.average_window):i]) for i in range(1,len(a))]
@@ -147,6 +161,7 @@ class Bookkeeper:
         plt.savefig(f'{self.run_folder}/{key}_moving_average.png')
         plt.close()
         
+        self.plot_actions()
     def plot_metrics(self):
         for key in self.metrics.keys():
             self.plot_and_save(key)
