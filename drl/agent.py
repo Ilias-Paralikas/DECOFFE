@@ -1,7 +1,4 @@
-import torch
-import torch.nn as nn
 import copy
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as f
@@ -163,9 +160,8 @@ class Agent():
         print('model weights loaded')
       else:
         print('weights folder not found')
-    except:
-      print('could not load model weights, check if the models are the same as the current run')
-          
+    except Exception as e:
+        print('An error occurred while loading the model weights:', str(e))    
   def store_transitions(self,state,lstm_state,action,reward,new_state,new_lstm_state,done):
     index = self.memory_counter % self.memory_size
     self.state_memory[index] =state
@@ -180,21 +176,22 @@ class Agent():
     
 
   def choose_action(self,observation,lstm_state):
-    self.lstm_history.append(lstm_state)
-    if np.random.uniform() > self.epsilon:
-      
-      observation_np = np.expand_dims(observation,axis=0) # Convert the list of NumPy arrays to a single NumPy array
-      lstm_history_np = np.expand_dims(self.lstm_history,axis=0)  # Convert the list of NumPy arrays to a single NumPy array
+    with torch.no_grad():
+      self.lstm_history.append(lstm_state)
+      if np.random.uniform() > self.epsilon:
+        
+        observation_np = np.expand_dims(observation,axis=0) # Convert the list of NumPy arrays to a single NumPy array
+        lstm_history_np = np.expand_dims(self.lstm_history,axis=0)  # Convert the list of NumPy arrays to a single NumPy array
 
-      observation = torch.tensor(observation_np,dtype=torch.float32).to(self.device)
-      lstm_input = torch.tensor(lstm_history_np,dtype=torch.float32).to(self.device)
-      action = np.argmax(self.Q_eval_network(observation, lstm_input).detach().cpu().numpy())
-    else:
-        if np.random.rand() < self.local_action_probability:
-            action =  0
-        else:
-            action =  np.random.randint( 1, self.number_of_actions)
-    return action
+        observation = torch.tensor(observation_np,dtype=torch.float32).to(self.device)
+        lstm_input = torch.tensor(lstm_history_np,dtype=torch.float32).to(self.device)
+        action = np.argmax(self.Q_eval_network(observation, lstm_input).detach().cpu().numpy())
+      else:
+          if np.random.rand() < self.local_action_probability:
+              action =  0
+          else:
+              action =  np.random.randint( 1, self.number_of_actions)
+      return action
 
 
   def get_lstm_sequence(self, index):
@@ -214,6 +211,8 @@ class Agent():
 
   
   def learn(self):
+    if self.epsilon == self.epsilon_end: 
+      return
     if self.memory_counter <= self.batch_size+self.lstm_time_step:
       return 
     self.learn_step_counter +=1
