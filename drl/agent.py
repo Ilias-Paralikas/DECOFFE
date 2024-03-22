@@ -240,10 +240,12 @@ class Agent():
 
 
     q_eval = self.Q_eval_network(state_batch, lstm_sequence_batch).gather(1, action_batch.unsqueeze(1)).squeeze(1)
-    q_next = self.Q_target_network(next_state_batch, next_lstm_sequence_batch)
+
+    q_next_eval = self.Q_eval_network(next_state_batch, next_lstm_sequence_batch)
+    next_actions = torch.argmax(q_next_eval, dim=1)
+    q_next_target = self.Q_target_network(next_state_batch, next_lstm_sequence_batch)
+    q_target_next = q_next_target.gather(1, next_actions.unsqueeze(1)).squeeze(1)
     
-    next_actions = torch.argmax(self.Q_eval_network(next_state_batch, next_lstm_sequence_batch), dim=1)
-    q_target_next = q_next.gather(1, next_actions.unsqueeze(1)).squeeze(1)
     mask = ~terminal_batch
     q_target_next = q_target_next * mask
     q_target = reward_batch + self.gamma * q_target_next

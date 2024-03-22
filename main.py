@@ -103,6 +103,7 @@ def main():
 
 
     for episode in range(episodes):
+        np.random.seed(0)
         done = False
         local_observations,active_queues = environment.reset()
         
