@@ -47,7 +47,6 @@ if __name__=="__main__":
         parser.add_argument('--epsilon_end', type=float, default=0.01, help='float, between 0 and 1')
         parser.add_argument('--local_action_probability', type=float, default=0.5, help='Float when picking random action, the probability of chosing local actions')
         parser.add_argument('--save_model_frequency', type=int, default=100, help='Integer, How ofter should the models be saved')
-        parser.add_argument('--train_in_exploit_state', action="store_true", help='if set, the model will be trained in the exploit state')
         parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='the file that the hyperparameters will be saved, for verison control')
         args = parser.parse_args()
         if args.validate:
@@ -85,8 +84,7 @@ if __name__=="__main__":
         'gamma':args.gamma,
         'epsilon_end':args.epsilon_end,
         'local_action_probability':args.local_action_probability,
-        'save_model_frequency' :args.save_model_frequency,   
-        'train_in_exploit_state':args.train_in_exploit_state     
+        'save_model_frequency' :args.save_model_frequency
         }
 
 

@@ -27,6 +27,8 @@ def main():
     parser.add_argument('--log_folder' ,type=str,default='bookkeeping/log_folder',help='where the runs will be stored')
     parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='the file that the hyperparameters will be saved, for verison control')
     parser.add_argument('--static',type=int, default=0, help='if the environment is static or not')
+    parser.add_argument('--train_in_exploit_state', action="store_true", help='if set, the model will be trained in the exploit state')
+
     args = parser.parse_args()
     resume_run = args.resume_run
     if resume_run:
@@ -98,7 +100,8 @@ def main():
                     epsilon_end = hyperparameters['epsilon_end'],
                     local_action_probability = hyperparameters['local_action_probability'],
                     save_model_frequency = hyperparameters['save_model_frequency'],
-                    epsilon=hyperparameters['epsilon'])
+                    epsilon=hyperparameters['epsilon'],
+                    train_in_exploit_state = args.train_in_exploit_state)
             for i in range(number_of_servers)]
 
 

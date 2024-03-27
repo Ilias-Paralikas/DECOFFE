@@ -88,6 +88,7 @@ class Agent():
                 epsilon_end,
                 local_action_probability,
                 save_model_frequency,
+                train_in_exploit_state,
                 read_checkpoint = True,
                 dueling=True):
       
@@ -106,6 +107,7 @@ class Agent():
     self.local_action_probability =local_action_probability
     self.checkpoint_folder= checkpoint_folder
     self.save_model_frequency = save_model_frequency
+    self.train_in_exploit_state = train_in_exploit_state
   
 
     self.batch_size = batch_size
@@ -211,7 +213,7 @@ class Agent():
 
   
   def learn(self):
-    if self.epsilon == self.epsilon_end: 
+    if self.epsilon == self.epsilon_end and not self.train_in_exploit_state: 
       return
     if self.memory_counter <= self.batch_size+self.lstm_time_step:
       return 
