@@ -4,6 +4,7 @@ __pycache__/
 # Ignore specific file
 hyperparameters/hyperparameters.json
 test.py
+test.ipynb 
 # Ignore everything in a specific folder
 bookkeeping/log_folder/
 .vscode/

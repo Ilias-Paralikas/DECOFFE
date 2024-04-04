@@ -6,7 +6,7 @@ NUMBER_OF_CLOUDS =1
 def comma_seperated_string_to_list(comma_seperated_String):
         return [int(x) for x in comma_seperated_String.split(',')]
 
-if __name__=="__main__":
+def main():
         parser = argparse.ArgumentParser(description='Script Configuration via Command Line')
         
         
@@ -99,3 +99,6 @@ if __name__=="__main__":
         with open(args.hyperparameters_file, "w") as outfile:
                 outfile.write(json_object)
         
+
+if __name__=="__main__":
+        main()
