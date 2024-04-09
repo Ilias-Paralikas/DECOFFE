@@ -1,10 +1,11 @@
 
 
 from environment.environment import Environment
-from drl.agent import Agent
+from decision_makers.agent import Agent
 from bookkeeping.bookkeeper import Bookkeeper
 import numpy as np
-
+from decision_makers.round_robbin import RoundRobin 
+from decision_makers.random import Random
 import torch    
 
 import json
@@ -17,6 +18,11 @@ def remove_id_from_list(lst, server_id):
 
 
 def main():
+    decision_makers = {
+        'drl': Agent,
+        'RoundRobin': RoundRobin,
+        'Random':Random
+    }
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  
     print(device)
     parser = argparse.ArgumentParser(description="Process some integers.")
@@ -80,7 +86,7 @@ def main():
     
     state_dimensions,lstm_shape,number_of_actions = environment.get_agent_variables()
 
-    agents = [Agent(id =i,
+    agents = [decision_makers[hyperparameters['descision_maker_choice']](id =i,
                     state_dimensions=state_dimensions,
                     lstm_shape=lstm_shape,
                     number_of_actions=number_of_actions,
@@ -135,7 +141,7 @@ def main():
                     
                     
             local_observations,active_queues  = local_observations_,active_queues_
-        bookkeeper.reset_episode(episode,agents[0].epsilon)
+        bookkeeper.reset_episode(episode,agents[0].get_epsilon())
 
     bookkeeper.plot_metrics()
     

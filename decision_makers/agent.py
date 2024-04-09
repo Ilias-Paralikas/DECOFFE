@@ -6,7 +6,7 @@ import numpy as np
 
 from collections import deque
 import os 
-
+from .decision_maker_base import DescisionMakerBase
 
 
 
@@ -65,7 +65,7 @@ class DeepQNetwork(nn.Module):
             q_values = self.output_layer(sequential_output)
         return q_values
 
-class Agent():
+class Agent(DescisionMakerBase):
   def __init__( self,
                 id,
                 state_dimensions,
@@ -196,23 +196,21 @@ class Agent():
       return action
 
 
-  def get_lstm_sequence(self, index):
-      start_index = max(0, index - self.lstm_time_step + 1)
-      end_index = index + 1 
-      actual_length = end_index - start_index
-
-
-      if start_index == 0 and actual_length < self.lstm_time_step:
-          sequence = torch.zeros((self.lstm_time_step, self.lstm_shape))
-          sequence[-actual_length:] = torch.tensor(self.lstm_memory[start_index:end_index])
-      else:
-          sequence = torch.tensor(self.lstm_memory[start_index:end_index])
-
-      return sequence
 
 
   
   def learn(self):
+
+    def get_lstm_sequence(index):
+        start_index = max(0, index - self.lstm_time_step + 1)
+        end_index = index + 1 
+        actual_length = end_index - start_index
+        if start_index == 0 and actual_length < self.lstm_time_step:
+            sequence = torch.zeros((self.lstm_time_step, self.lstm_shape))
+            sequence[-actual_length:] = torch.tensor(self.lstm_memory[start_index:end_index])
+        else:
+            sequence = torch.tensor(self.lstm_memory[start_index:end_index])
+        return sequence
     if self.epsilon == self.epsilon_end and not self.train_in_exploit_state: 
       return
     if self.memory_counter <= self.batch_size+self.lstm_time_step:
@@ -230,12 +228,12 @@ class Agent():
     batch_indices = np.random.choice(max_memory, self.batch_size, replace=False)
 
     state_batch = torch.tensor(self.state_memory[batch_indices]).to(self.device)
-    lstm_sequence_batch = [self.get_lstm_sequence(index) for index in batch_indices]
+    lstm_sequence_batch = [get_lstm_sequence(index) for index in batch_indices]
     lstm_sequence_batch = torch.stack(lstm_sequence_batch).to(self.device)
     action_batch = torch.tensor(self.action_memory[batch_indices]).to(self.device)
     reward_batch = torch.tensor(self.reward_memory[batch_indices]).to(self.device)
     next_state_batch = torch.tensor(self.new_state_memory[batch_indices]).to(self.device)
-    next_lstm_sequence_batch = [self.get_lstm_sequence(index + 1) for index in batch_indices]  
+    next_lstm_sequence_batch = [get_lstm_sequence(index + 1) for index in batch_indices]  
     next_lstm_sequence_batch = torch.stack(next_lstm_sequence_batch).to(self.device)
     terminal_batch = torch.tensor(self.terminal_memory[batch_indices]).to(self.device)
 
@@ -260,3 +258,6 @@ class Agent():
     if self.learn_step_counter % self.save_model_frequency == 0 :
       self.store_model()
     
+    
+  def get_epsilon(self):
+     return self.epsilon

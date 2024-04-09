@@ -48,6 +48,8 @@ def main():
         parser.add_argument('--local_action_probability', type=float, default=0.5, help='Float when picking random action, the probability of chosing local actions')
         parser.add_argument('--save_model_frequency', type=int, default=100, help='Integer, How ofter should the models be saved')
         parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='the file that the hyperparameters will be saved, for verison control')
+        parser.add_argument('--descision_maker_choice', type=str, default='drl', help='chose the method of descision maker, options are drl, round_robin, random')
+
         args = parser.parse_args()
         if args.validate:
                 epsilon = 0.0
@@ -84,7 +86,8 @@ def main():
         'gamma':args.gamma,
         'epsilon_end':args.epsilon_end,
         'local_action_probability':args.local_action_probability,
-        'save_model_frequency' :args.save_model_frequency
+        'save_model_frequency' :args.save_model_frequency,
+        'descision_maker_choice': args.descision_maker_choice
         }
 
 

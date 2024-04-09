@@ -9,4 +9,5 @@ test.ipynb
 bookkeeping/log_folder/
 .vscode/
 venv/
-checkpoints/
+bookkeeping/baselines_log/
+meta_plots/
