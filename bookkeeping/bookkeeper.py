@@ -55,6 +55,8 @@ class Bookkeeper:
         self.actions = []
         
         os.makedirs(self.checkpoint_folder,exist_ok=True)
+        
+        self.champion_score  = float('-inf')
 
     def reset_episode(self,episode,epsilon):
         episode_tasks_arrived = np.vstack(self.tasks_arrived)
@@ -70,7 +72,11 @@ class Bookkeeper:
           
         self.metrics['epsilon_history'].append(epsilon)
         
-                
+        current_average_scores =  np.array(self.metrics['rewards_history'][-self.average_window:]).mean(axis=0)  
+        best_score = current_average_scores.max()
+        champion_status = np.where((current_average_scores == best_score) &(best_score > self.champion_score), True, False)
+        if best_score > self.champion_score:
+            self.champion_score  = best_score
         with open(self.metrics_folder, 'wb') as f:
             pickle.dump(self.metrics, f)
             
@@ -81,6 +87,8 @@ class Bookkeeper:
         self.actions = []
         score, average_score,drop_ratio,epsilon = np.mean(self.metrics['rewards_history'][-1]), np.mean(self.metrics['rewards_history'][-self.average_window:]),np.mean(self.metrics['task_drop_ratio_history'][-1]),self.metrics['epsilon_history'][-1]
         print('Episode: {}\tScore: {:.3f}\t Average Score: {:.3f}\tDrop Ratio: {:.3f}\tEpsilon: {:.3f}'.format(episode,score,average_score,drop_ratio ,epsilon))
+        return champion_status  
+    
     def store_timestep(self,info):
         self.tasks_arrived.append(info['tasks_arrived'])
         self.tasks_dropped.append(info['tasks_dropped'])

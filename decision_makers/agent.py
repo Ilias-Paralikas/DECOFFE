@@ -88,6 +88,7 @@ class Agent(DescisionMakerBase):
                 epsilon_end,
                 local_action_probability,
                 save_model_frequency,
+                champion_file,
                 train_in_exploit_state,
                 read_checkpoint = True,
                 dueling=True,
@@ -110,6 +111,7 @@ class Agent(DescisionMakerBase):
     self.checkpoint_folder= checkpoint_folder
     self.save_model_frequency = save_model_frequency
     self.train_in_exploit_state = train_in_exploit_state
+    self.champion_file  =champion_file
   
 
     self.batch_size = batch_size
@@ -152,8 +154,10 @@ class Agent(DescisionMakerBase):
     self.action_memory = np.zeros(self.memory_size,dtype=np.int64)
     self.terminal_memory= np.zeros(self.memory_size,dtype=bool)
 
-  def store_model(self):
-    torch.save(self.Q_eval_network, self.checkpoint_folder)
+  def store_model(self,path=None):
+    if not path:
+      path = self.checkpoint_folder
+    torch.save(self.Q_eval_network, path)
     
   def load_model(self,checkpoint_folder=None):
     if not checkpoint_folder:
@@ -263,3 +267,8 @@ class Agent(DescisionMakerBase):
     
   def get_epsilon(self):
      return self.epsilon
+   
+  def store_champion(self, is_champion,*args, **kwargs):
+    if is_champion:
+      self.store_model(path  = self.champion_file)
+    return

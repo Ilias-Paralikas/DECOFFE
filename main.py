@@ -93,6 +93,7 @@ def main():
         checkpoint_folders =  [checkpoint_folder+'/' + args.single_agent+'.pt' for i in range(number_of_servers)]
     else:
         checkpoint_folders = [checkpoint_folder+'/agent_'+str(i)+'.pt' for i in range(number_of_servers)]
+    champion_file =  checkpoint_folder+'/champion.pt'
         
     agents = [decision_makers[hyperparameters['descision_maker_choice']](id =i,
                     state_dimensions=state_dimensions,
@@ -116,6 +117,7 @@ def main():
                     save_model_frequency = hyperparameters['save_model_frequency'],
                     epsilon=hyperparameters['epsilon'],
                     train_in_exploit_state = args.train_in_exploit_state,
+                    champion_file = champion_file,
                     hyperparameters=hyperparameters)
                     
             for i in range(number_of_servers)]
@@ -152,7 +154,9 @@ def main():
                     
             local_observations,active_queues  = local_observations_,active_queues_
             
-        bookkeeper.reset_episode(episode,agents[0].get_epsilon())
+        champion_status = bookkeeper.reset_episode(episode,agents[0].get_epsilon())
+        for i in range(len(agents)):
+            agents[i].store_champion(champion_status[i])
 
     bookkeeper.plot_metrics()
     
