@@ -90,7 +90,9 @@ class Agent(DescisionMakerBase):
                 save_model_frequency,
                 train_in_exploit_state,
                 read_checkpoint = True,
-                dueling=True):
+                dueling=True,
+                *args, 
+                **kwargs):
       
     self.id = id
     self.device= device

@@ -6,6 +6,7 @@ from bookkeeping.bookkeeper import Bookkeeper
 import numpy as np
 from decision_makers.round_robbin import RoundRobin 
 from decision_makers.random import Random
+from decision_makers.uloof import ULOOF
 import torch    
 
 import json
@@ -21,19 +22,21 @@ def main():
     decision_makers = {
         'drl': Agent,
         'RoundRobin': RoundRobin,
-        'Random':Random
+        'Random':Random,
+        'ULOOF':ULOOF
     }
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  
     print(device)
     parser = argparse.ArgumentParser(description="Process some integers.")
  
-    parser.add_argument('--resume_run', type=str, nargs='?', default=None, help='an optional string')
-    parser.add_argument('--episodes', type=int, default=1000, help='Integer')
-    parser.add_argument('--average_window', type=int,   default=500, help='anerage ploting window')
-    parser.add_argument('--log_folder' ,type=str,default='bookkeeping/log_folder',help='where the runs will be stored')
-    parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='the file that the hyperparameters will be saved, for verison control')
-    parser.add_argument('--static',type=int, default=0, help='if the environment is static or not')
-    parser.add_argument('--train_in_exploit_state', action="store_true", help='if set, the model will be trained in the exploit state')
+    parser.add_argument('--resume_run', default=None,type=str, nargs='?', help='This argument is used to specify the run to resume. If this argument is provided, the script will attempt to resume a previous run with the given name. If the run does not exist, the script will print an error message and exit.')
+    parser.add_argument('--episodes', default=10,type=int,  help='This argument specifies the number of episodes to run in the simulation. The default value is 10.')
+    parser.add_argument('--average_window',default=500, type=int,   help=': This argument specifies the window size for averaging the results for plotting. The default value is 500.')
+    parser.add_argument('--log_folder' ,type=str,default='bookkeeping/log_folder',help=' This argument specifies the directory where the logs will be stored. The default directory is "bookkeeping/log_folder"')
+    parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='This argument specifies the file where the hyperparameters are stored. The default file is "hyperparameters/hyperparameters.json"')
+    parser.add_argument('--static',type=int, default=0, help='This argument specifies whether the environment is static or not. If this argument is set to a non-zero integer, the environment will be reset to its initial state every --static episodes.')
+    parser.add_argument('--train_in_exploit_state', action="store_true", help='If this flag is set, the model will be trained in the exploit state.')
+    parser.add_argument('--single_agent', default=None,type= str,help="This argument is used to specify a single agent's weights for all the agents. If this argument is provided, all agents will use the weights of the specified agent.")
 
     args = parser.parse_args()
     resume_run = args.resume_run
@@ -85,7 +88,12 @@ def main():
     
     
     state_dimensions,lstm_shape,number_of_actions = environment.get_agent_variables()
-
+    
+    if args.resume_run  and args.single_agent:
+        checkpoint_folders =  [checkpoint_folder+'/' + args.single_agent+'.pt' for i in range(number_of_servers)]
+    else:
+        checkpoint_folders = [checkpoint_folder+'/agent_'+str(i)+'.pt' for i in range(number_of_servers)]
+        
     agents = [decision_makers[hyperparameters['descision_maker_choice']](id =i,
                     state_dimensions=state_dimensions,
                     lstm_shape=lstm_shape,
@@ -101,13 +109,15 @@ def main():
                     loss_function = getattr(torch.nn, hyperparameters['loss_function']),
                     optimizer = getattr(torch.optim, hyperparameters['optimizer']),
                     device=device,
-                    checkpoint_folder =checkpoint_folder+'/agent_'+str(i)+'.pt' ,
+                    checkpoint_folder =checkpoint_folders[i] ,
                     gamma = hyperparameters['gamma'],
                     epsilon_end = hyperparameters['epsilon_end'],
                     local_action_probability = hyperparameters['local_action_probability'],
                     save_model_frequency = hyperparameters['save_model_frequency'],
                     epsilon=hyperparameters['epsilon'],
-                    train_in_exploit_state = args.train_in_exploit_state)
+                    train_in_exploit_state = args.train_in_exploit_state,
+                    hyperparameters=hyperparameters)
+                    
             for i in range(number_of_servers)]
 
 
@@ -141,6 +151,7 @@ def main():
                     
                     
             local_observations,active_queues  = local_observations_,active_queues_
+            
         bookkeeper.reset_episode(episode,agents[0].get_epsilon())
 
     bookkeeper.plot_metrics()
