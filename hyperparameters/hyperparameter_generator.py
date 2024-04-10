@@ -33,7 +33,7 @@ def main():
         parser.add_argument('--task_computational_density', type=float, default=0.297, help='Float')
 
         # Neural network hyperparameters
-        parser.add_argument('--hidden_layers', type=str, default='20', help='comma-separated integers')
+        parser.add_argument('--hidden_layers', type=str, default='20,20,20', help='comma-separated integers')
         parser.add_argument('--lstm_layers', type=int, default=20, help='Integer')
         parser.add_argument('--epsilon_decrement', type=float, default=1e-6, help='Float')
         parser.add_argument('--batch_size', type=int, default=64, help='Integer')
