@@ -35,7 +35,7 @@ def main():
         # Neural network hyperparameters
         parser.add_argument('--hidden_layers', type=str, default='20,20,20', help='comma-separated integers')
         parser.add_argument('--lstm_layers', type=int, default=20, help='Integer')
-        parser.add_argument('--epsilon_decrement', type=float, default=1e-6, help='Float')
+        parser.add_argument('--epsilon_decrement', type=float, default=1e-5, help='Float')
         parser.add_argument('--batch_size', type=int, default=64, help='Integer')
         parser.add_argument('--learning_rate', type=float, default=1e-4, help='Float')
         parser.add_argument('--memory_size', type=int, default=int(1e4), help='Integer')

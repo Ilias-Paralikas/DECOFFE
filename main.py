@@ -8,6 +8,7 @@ from decision_makers.round_robbin import RoundRobin
 from decision_makers.random import Random
 from decision_makers.uloof import ULOOF
 from decision_makers.local import Local
+from decision_makers.full_offloading import FullOffloading
 
 import torch    
 
@@ -26,7 +27,8 @@ def main():
         'RoundRobin': RoundRobin,
         'Random':Random,
         'ULOOF':ULOOF,
-        'Local':Local
+        'Local':Local,
+        'FullOffloading':FullOffloading
     }
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  
     print(device)

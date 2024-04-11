@@ -58,6 +58,8 @@ class Bookkeeper:
         
         os.makedirs(self.checkpoint_folder,exist_ok=True)
         
+        self.not_plotable_metrics  = ['champion_score']
+        
 
     def reset_episode(self,episode,epsilon):
         episode_tasks_arrived = np.vstack(self.tasks_arrived)
@@ -119,6 +121,8 @@ class Bookkeeper:
         if key not in self.metrics:
             print(f"No data found for key '{key}'")
             return
+        if key in self.not_plotable_metrics:
+            return 
         list_of_arrays = self.metrics[key]
         stacked_arrays = np.vstack(list_of_arrays)
 
@@ -142,6 +146,8 @@ class Bookkeeper:
         if key not in self.metrics:
             print(f"No data found for key '{key}'")
             return
+        if key in self.not_plotable_metrics:
+            return 
 
         list_of_arrays = self.metrics[key]
 
