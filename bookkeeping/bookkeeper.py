@@ -72,7 +72,7 @@ class Bookkeeper:
           
         self.metrics['epsilon_history'].append(epsilon)
         
-        current_average_scores =  np.array(self.metrics['rewards_history'][-self.average_window:]).mean(axis=0)  
+        current_average_scores =  np.array(self.metrics['rewards_history'][-self.average_window:]).sum(axis=0)  /self.average_window
         best_score = current_average_scores.max()
         champion_status = np.where((current_average_scores == best_score) &(best_score > self.champion_score), True, False)
         if best_score > self.champion_score:
