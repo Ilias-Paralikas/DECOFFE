@@ -272,4 +272,5 @@ class Agent(DescisionMakerBase):
   def store_champion(self, is_champion,*args, **kwargs):
     if is_champion:
       self.store_model(path  = self.champion_file)
+      print('Champion model stored from server ',self.id)
     return
