@@ -272,7 +272,7 @@ class Agent(DescisionMakerBase):
      return self.epsilon
    
   def store_champion(self, is_champion,*args, **kwargs):
-    if is_champion and self.epsilon <self.championship_epsilon_start:
+    if is_champion and self.epsilon <self.championship_epsilon_start and self.memory_counter >self.memory_size:
       self.store_model(path  = self.champion_file)
       print('Champion model stored from server ',self.id)
     return
