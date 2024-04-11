@@ -90,6 +90,7 @@ class Agent(DescisionMakerBase):
                 save_model_frequency,
                 champion_file,
                 train_in_exploit_state,
+                championship_epsilon_start,
                 read_checkpoint = True,
                 dueling=True,
                 *args, 
@@ -112,6 +113,7 @@ class Agent(DescisionMakerBase):
     self.save_model_frequency = save_model_frequency
     self.train_in_exploit_state = train_in_exploit_state
     self.champion_file  =champion_file
+    self.championship_epsilon_start = championship_epsilon_start
   
 
     self.batch_size = batch_size
@@ -270,7 +272,7 @@ class Agent(DescisionMakerBase):
      return self.epsilon
    
   def store_champion(self, is_champion,*args, **kwargs):
-    if is_champion:
+    if is_champion and self.epsilon <self.championship_epsilon_start:
       self.store_model(path  = self.champion_file)
       print('Champion model stored from server ',self.id)
     return

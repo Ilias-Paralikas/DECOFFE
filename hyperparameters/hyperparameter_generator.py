@@ -49,7 +49,7 @@ def main():
         parser.add_argument('--save_model_frequency', type=int, default=100, help='Integer, How ofter should the models be saved')
         parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='the file that the hyperparameters will be saved, for verison control')
         parser.add_argument('--descision_maker_choice', type=str, default='drl', help='chose the method of descision maker, options are drl, round_robin, random')
-
+        parser.add_argument('--championship_epsilon_start', type=float, default=0.2, help='float, between 0 and 1, the epsilon value for the championship')
         args = parser.parse_args()
         if args.validate:
                 epsilon = 0.0
@@ -87,7 +87,8 @@ def main():
         'epsilon_end':args.epsilon_end,
         'local_action_probability':args.local_action_probability,
         'save_model_frequency' :args.save_model_frequency,
-        'descision_maker_choice': args.descision_maker_choice
+        'descision_maker_choice': args.descision_maker_choice,
+        'championship_epsilon_start' :args.championship_epsilon_start
         }
 
 
