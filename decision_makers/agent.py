@@ -170,6 +170,7 @@ class Agent(DescisionMakerBase):
         print('weights folder not found')
     except Exception as e:
         print('An error occurred while loading the model weights:', str(e))    
+        
   def store_transitions(self,state,lstm_state,action,reward,new_state,new_lstm_state,done):
     index = self.memory_counter % self.memory_size
     self.state_memory[index] =state

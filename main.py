@@ -7,6 +7,8 @@ import numpy as np
 from decision_makers.round_robbin import RoundRobin 
 from decision_makers.random import Random
 from decision_makers.uloof import ULOOF
+from decision_makers.local import Local
+
 import torch    
 
 import json
@@ -23,7 +25,8 @@ def main():
         'drl': Agent,
         'RoundRobin': RoundRobin,
         'Random':Random,
-        'ULOOF':ULOOF
+        'ULOOF':ULOOF,
+        'Local':Local
     }
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  
     print(device)
