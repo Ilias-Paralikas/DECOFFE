@@ -27,7 +27,7 @@ def main():
         parser.add_argument('--timeout_delay', type=int, default=10, help='Integer')
         parser.add_argument('--max_bit_arrive', type=float, default=5.0, help='Float')
         parser.add_argument('--min_bit_arrive', type=float, default=2.0, help='Float')
-        parser.add_argument('--task_arrive_probability', type=float, default=0.4, help='Float between 0 and 1')
+        parser.add_argument('--task_arrive_probability', type=float, default=0.7, help='Float between 0 and 1')
         parser.add_argument('--delta_duration', type=float, default=0.1, help='Float')
         parser.add_argument('--task_drop_penalty_multiplier', type=float, default=4, help='Float')
         parser.add_argument('--task_computational_density', type=float, default=0.297, help='Float')
