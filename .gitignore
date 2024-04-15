@@ -10,4 +10,4 @@ bookkeeping/log_folder/
 .vscode/
 venv/
 bookkeeping/baselines_log/
-meta_plots/
+meta_plots/logs
