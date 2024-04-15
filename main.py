@@ -155,8 +155,8 @@ def main():
                                                 new_lstm_state=new_lstm_input,
                                                 done=done)
                     agents[i].learn()
-            if hyperparameters['averagin_frequency']:
-                if episode % hyperparameters['averagin_frequency'] == 0:
+            if hyperparameters['averaging_frequency']:
+                if episode % hyperparameters['averaging_frequency'] == 0:
                     agents[0].average_Weights(agents)
             
                     
