@@ -15,3 +15,5 @@ class DescisionMakerBase():
     return -1
   def store_champion(self, *args, **kwargs):
     pass
+  def average_Weights(self,*args, **kwargs):
+    pass

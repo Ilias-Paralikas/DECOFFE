@@ -276,3 +276,31 @@ class Agent(DescisionMakerBase):
       self.store_model(path  = self.champion_file)
       print('Champion model stored from server ',self.id)
     return
+  
+
+  def average_Weights(self,agents,*args, **kwargs):
+        sum_weights = None
+        for agent in agents:
+            state_dict = agent.Q_eval_network.state_dict()
+            if sum_weights is None:
+                sum_weights = {name: torch.zeros_like(param) for name, param in state_dict.items()}
+            for name, param in state_dict.items():
+                sum_weights[name] += param
+        average_weights = {name: param / len(agents) for name, param in sum_weights.items()}
+
+        # Load the average weights into each agent
+        for agent in agents:
+            agent.Q_eval_network.load_state_dict(average_weights)
+            
+        sum_weights = None
+        for agent in agents:
+            state_dict = agent.Q_target_network.state_dict()
+            if sum_weights is None:
+                sum_weights = {name: torch.zeros_like(param) for name, param in state_dict.items()}
+            for name, param in state_dict.items():
+                sum_weights[name] += param
+        average_weights = {name: param / len(agents) for name, param in sum_weights.items()}
+
+        # Load the average weights into each agent
+        for agent in agents:
+            agent.Q_target_network.load_state_dict(average_weights)
