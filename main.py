@@ -42,7 +42,6 @@ def main():
     parser.add_argument('--static',type=int, default=0, help='This argument specifies whether the environment is static or not. If this argument is set to a non-zero integer, the environment will be reset to its initial state every --static episodes.')
     parser.add_argument('--train_in_exploit_state', action="store_true", help='If this flag is set, the model will be trained in the exploit state.')
     parser.add_argument('--single_agent', default=None,type= str,help="This argument is used to specify a single agent's weights for all the agents. If this argument is provided, all agents will use the weights of the specified agent.")
-    parser.add_argument('--averagin_frequency', default=0,type= int,help="This argument is used to specify the frequency at which the weights of the agents are averaged. If this argument is provided, the weights of the agents will be averaged every averagin_frequency episodes. The default value is 0, meaning no averaging")
 
     args = parser.parse_args()
     resume_run = args.resume_run
@@ -156,8 +155,8 @@ def main():
                                                 new_lstm_state=new_lstm_input,
                                                 done=done)
                     agents[i].learn()
-            if args.averagin_frequency:
-                if episode % args.averagin_frequency == 0:
+            if hyperparameters['averagin_frequency']:
+                if episode % hyperparameters['averagin_frequency'] == 0:
                     agents[0].average_Weights(agents)
             
                     
