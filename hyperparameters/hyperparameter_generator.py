@@ -51,7 +51,7 @@ def main():
         parser.add_argument('--descision_maker_choice', type=str, default='drl', help='chose the method of descision maker, options are drl, round_robin, random')
         parser.add_argument('--championship_epsilon_start', type=float, default=0.2, help='float, between 0 and 1, the epsilon value for the championship')
         parser.add_argument('--averaging_frequency', default=0,type= int,help="This argument is used to specify the frequency at which the weights of the agents are averaged. If this argument is provided, the weights of the agents will be averaged every averaging_frequency episodes. The default value is 0, meaning no averaging")
-
+        parser.add_argument('--federation_policy', type=str, default='None')
         args = parser.parse_args()
         if args.validate:
                 epsilon = 0.0
@@ -91,7 +91,8 @@ def main():
         'save_model_frequency' :args.save_model_frequency,
         'descision_maker_choice': args.descision_maker_choice,
         'championship_epsilon_start' :args.championship_epsilon_start,
-        'averaging_frequency': args.averaging_frequency
+        'averaging_frequency': args.averaging_frequency,
+        'federation_policy': args.federation_policy
         }
 
 

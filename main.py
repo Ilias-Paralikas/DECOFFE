@@ -9,7 +9,7 @@ from decision_makers.random import Random
 from decision_makers.uloof import ULOOF
 from decision_makers.local import Local
 from decision_makers.full_offloading import FullOffloading
-
+from federated_learning.simpleaverage import SimpleAverage
 import torch    
 
 import json
@@ -29,6 +29,11 @@ def main():
         'ULOOF':ULOOF,
         'Local':Local,
         'FullOffloading':FullOffloading
+    }
+    
+    federation_policies ={
+        'None':None,
+        'SimpleAverage':SimpleAverage
     }
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  
     print(device)
@@ -127,6 +132,8 @@ def main():
                     hyperparameters=hyperparameters)
                     
             for i in range(number_of_servers)]
+    
+    federation_policy_maker  = federation_policies[hyperparameters['federation_policy']]()
 
 
     for episode in range(episodes):
@@ -155,9 +162,11 @@ def main():
                                                 new_lstm_state=new_lstm_input,
                                                 done=done)
                     agents[i].learn()
-            if hyperparameters['averaging_frequency']:
+                    
+                    
+            if hyperparameters['averaging_frequency'] and hyperparameters['federation_policy']:
                 if episode % hyperparameters['averaging_frequency'] == 0:
-                    agents[0].average_Weights(agents)
+                    federation_policy_maker.average_weights(agents= agents)
             
                     
                     
