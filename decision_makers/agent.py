@@ -276,8 +276,8 @@ class Agent(DescisionMakerBase):
       self.store_model(path  = self.champion_file)
       with open(self.champion_file+'.txt', 'w') as f:
         # Write the new content to the file
-        f.write('Champion model stored from server ',self.id)
-      print('Champion model stored from server ',self.id)
+        f.write('Champion model stored from server ',self.id,' at episode ',episode)
+      print('Champion model stored from server ',self.id,' at episode ',episode)
 
     return
   
