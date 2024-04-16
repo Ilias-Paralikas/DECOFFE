@@ -271,10 +271,14 @@ class Agent(DescisionMakerBase):
   def get_epsilon(self):
      return self.epsilon
    
-  def store_champion(self, is_champion,*args, **kwargs):
+  def store_champion(self, is_champion,episode,*args, **kwargs):
     if is_champion and self.epsilon <self.championship_epsilon_start and self.memory_counter >self.memory_size:
       self.store_model(path  = self.champion_file)
+      with open(self.champion_file+'.txt', 'w') as f:
+        # Write the new content to the file
+        f.write('Champion model stored from server ',self.id)
       print('Champion model stored from server ',self.id)
+
     return
   
 

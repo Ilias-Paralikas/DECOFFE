@@ -165,7 +165,7 @@ def main():
             
         champion_status = bookkeeper.reset_episode(episode,agents[0].get_epsilon())
         for i in range(len(agents)):
-            agents[i].store_champion(champion_status[i])
+            agents[i].store_champion(champion_status[i],episode)
 
     bookkeeper.plot_metrics()
     
