@@ -49,9 +49,14 @@ def main():
         parser.add_argument('--save_model_frequency', type=int, default=100, help='Integer, How ofter should the models be saved')
         parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='the file that the hyperparameters will be saved, for verison control')
         parser.add_argument('--descision_maker_choice', type=str, default='drl', help='chose the method of descision maker, options are drl, round_robin, random')
-        parser.add_argument('--championship_epsilon_start', type=float, default=0.2, help='float, between 0 and 1, the epsilon value for the championship')
+        parser.add_argument('--championship_epsilon_start', type=float, default=0.15, help='float, between 0 and 1, the epsilon value for the championship')
+        parser.add_argument('--championship_episode_start', type=int, default=10, help='float, between 0 and 1, the epsilon value for the championship')
+
         parser.add_argument('--averaging_frequency', default=0,type= int,help="This argument is used to specify the frequency at which the weights of the agents are averaged. If this argument is provided, the weights of the agents will be averaged every averaging_frequency episodes. The default value is 0, meaning no averaging")
         parser.add_argument('--federation_policy', type=str, default='None')
+        
+        parser.add_argument('--static_environment',type=int, default=0, help='This argument specifies whether the environment is static or not. If this argument is set to a non-zero integer, the environment will be reset to its initial state every --static episodes.')
+
         args = parser.parse_args()
         if args.validate:
                 epsilon = 0.0
@@ -91,8 +96,10 @@ def main():
         'save_model_frequency' :args.save_model_frequency,
         'descision_maker_choice': args.descision_maker_choice,
         'championship_epsilon_start' :args.championship_epsilon_start,
+        'championship_episode_start':args.championship_episode_start,
         'averaging_frequency': args.averaging_frequency,
-        'federation_policy': args.federation_policy
+        'federation_policy': args.federation_policy,
+        'static_environment' :args.static_environment
         }
 
 

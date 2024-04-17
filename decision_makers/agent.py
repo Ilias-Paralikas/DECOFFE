@@ -90,7 +90,6 @@ class Agent(DescisionMakerBase):
                 save_model_frequency,
                 champion_file,
                 train_in_exploit_state,
-                championship_epsilon_start,
                 read_checkpoint = True,
                 dueling=True,
                 *args, 
@@ -113,7 +112,6 @@ class Agent(DescisionMakerBase):
     self.save_model_frequency = save_model_frequency
     self.train_in_exploit_state = train_in_exploit_state
     self.champion_file  =champion_file
-    self.championship_epsilon_start = championship_epsilon_start
   
 
     self.batch_size = batch_size
@@ -272,11 +270,10 @@ class Agent(DescisionMakerBase):
      return self.epsilon
    
   def store_champion(self, is_champion,episode,*args, **kwargs):
-    if is_champion and self.epsilon <self.championship_epsilon_start and self.memory_counter >self.memory_size:
+    if is_champion:
       self.store_model(path  = self.champion_file)
       with open(self.champion_file+'.txt', 'w') as f:
-        # Write the new content to the file
-        f.write('Champion model stored from server ',self.id,' at episode ',episode)
+        f.write('Champion model stored from server {} at episode {}'.format(self.id, episode))      
       print('Champion model stored from server ',self.id,' at episode ',episode)
 
     return

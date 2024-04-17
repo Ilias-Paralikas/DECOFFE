@@ -61,7 +61,7 @@ class Bookkeeper:
         self.not_plotable_metrics  = ['champion_score']
         
 
-    def reset_episode(self,episode,epsilon):
+    def reset_episode(self,epsilon):
         episode_tasks_arrived = np.vstack(self.tasks_arrived)
         episode_tasks_arrived = np.sum(episode_tasks_arrived,axis=0)
         episode_tasks_drop = np.vstack(self.tasks_dropped)
@@ -75,11 +75,7 @@ class Bookkeeper:
           
         self.metrics['epsilon_history'].append(epsilon)
         
-        current_average_scores =  np.array(self.metrics['rewards_history'][-self.average_window:]).mean(axis=0)  
-        best_score = current_average_scores.max()
-        champion_status = np.where((current_average_scores == best_score) &(best_score > self.metrics['champion_score']), True, False)
-        if best_score > self.metrics['champion_score']:
-            self.metrics['champion_score']  = best_score
+      
         with open(self.metrics_folder, 'wb') as f:
             pickle.dump(self.metrics, f)
             
@@ -89,9 +85,26 @@ class Bookkeeper:
         self.last_actions = self.actions
         self.actions = []
         score, average_score,drop_ratio,epsilon = np.mean(self.metrics['rewards_history'][-1]), np.mean(self.metrics['rewards_history'][-self.average_window:]),np.mean(self.metrics['task_drop_ratio_history'][-1]),self.metrics['epsilon_history'][-1]
-        print('Episode: {}\tScore: {:.3f}\t Average Score: {:.3f}\tDrop Ratio: {:.3f}\tEpsilon: {:.3f}'.format(episode,score,average_score,drop_ratio ,epsilon))
-        return champion_status  
+        print('Episode: {}\tScore: {:.3f}\t Average Score: {:.3f}\tDrop Ratio: {:.3f}\tEpsilon: {:.3f}'.format(len(self.metrics['rewards_history']),score,average_score,drop_ratio ,epsilon))
     
+    
+    def start_championship(self,championship_epsilon_start,championship_episode_start):
+        self.championship_epsilon_start = championship_epsilon_start
+        self.championship_episode_start = championship_episode_start
+    def get_champion(self,
+                     running_episode):
+        
+        total_episodes =len(self.metrics['rewards_history'])
+        if self.metrics['epsilon_history'][-1] < self.championship_epsilon_start and running_episode >self.championship_episode_start:
+            current_average_scores =  np.array(self.metrics['rewards_history'][-self.average_window:]).mean(axis=0)  
+            best_score = current_average_scores.max()
+            champion_status = np.where((current_average_scores == best_score) &(best_score > self.metrics['champion_score']), True, False)
+            if best_score > self.metrics['champion_score']:
+                self.metrics['champion_score']  = best_score
+            return champion_status, total_episodes
+        else:
+            return [False]*len(self.metrics['rewards_history'][-1]) ,total_episodes
+
     def store_timestep(self,info):
         self.tasks_arrived.append(info['tasks_arrived'])
         self.tasks_dropped.append(info['tasks_dropped'])
@@ -129,7 +142,7 @@ class Bookkeeper:
         transposed_arrays = stacked_arrays.T
         plt.figure(figsize=(10, 6))
         for i, column in enumerate(transposed_arrays):
-            plt.plot(column, label=f'agent {i+1} {key} ', linestyle='--')
+            plt.plot(column, label=f'agent {i} {key} ', linestyle='--')
         mean_values = np.mean(transposed_arrays, axis=0)
         plt.plot(mean_values, label='Mean', color='red', linewidth=6)
         plt.legend()
@@ -162,7 +175,7 @@ class Bookkeeper:
         means = []  # List to store the means of the moving averages
         for i, column in enumerate(transposed_arrays):
             moving_avg = self.moving_average(column)  # Change n to your desired window size
-            plt.plot(moving_avg, label=f'agent {i+1}', linestyle='--')
+            plt.plot(moving_avg, label=f'agent {i}', linestyle='--')
             means.append(moving_avg)
         means = np.mean(means, axis=0)
         # Plot the mean of the moving averages

@@ -9,7 +9,9 @@ from decision_makers.random import Random
 from decision_makers.uloof import ULOOF
 from decision_makers.local import Local
 from decision_makers.full_offloading import FullOffloading
+from federated_learning.flbase import FlBase
 from federated_learning.simpleaverage import SimpleAverage
+
 import torch    
 
 import json
@@ -32,7 +34,7 @@ def main():
     }
     
     federation_policies ={
-        'None':None,
+        'None':FlBase,
         'SimpleAverage':SimpleAverage
     }
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  
@@ -44,7 +46,6 @@ def main():
     parser.add_argument('--average_window',default=500, type=int,   help=': This argument specifies the window size for averaging the results for plotting. The default value is 500.')
     parser.add_argument('--log_folder' ,type=str,default='bookkeeping/log_folder',help=' This argument specifies the directory where the logs will be stored. The default directory is "bookkeeping/log_folder"')
     parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='This argument specifies the file where the hyperparameters are stored. The default file is "hyperparameters/hyperparameters.json"')
-    parser.add_argument('--static',type=int, default=0, help='This argument specifies whether the environment is static or not. If this argument is set to a non-zero integer, the environment will be reset to its initial state every --static episodes.')
     parser.add_argument('--train_in_exploit_state', action="store_true", help='If this flag is set, the model will be trained in the exploit state.')
     parser.add_argument('--single_agent', default=None,type= str,help="This argument is used to specify a single agent's weights for all the agents. If this argument is provided, all agents will use the weights of the specified agent.")
 
@@ -75,7 +76,8 @@ def main():
                                 log_folder=args.log_folder)
         hyperparameters_file,checkpoint_folder = bookkeeper.get_folder_names()
 
-    
+    bookkeeper.start_championship(championship_epsilon_start=hyperparameters['championship_epsilon_start'],
+                                  championship_episode_start=hyperparameters['championship_episode_start'])  
     print(hyperparameters)
     
     
@@ -128,7 +130,6 @@ def main():
                     epsilon=hyperparameters['epsilon'],
                     train_in_exploit_state = args.train_in_exploit_state,
                     champion_file = champion_file,
-                    championship_epsilon_start = hyperparameters['championship_epsilon_start'],
                     hyperparameters=hyperparameters)
                     
             for i in range(number_of_servers)]
@@ -137,8 +138,8 @@ def main():
 
 
     for episode in range(episodes):
-        if args.static:
-            if episode % args.static == 0:
+        if hyperparameters['static_environment']:
+            if episode % hyperparameters['static_environment'] == 0:
                 np.random.seed(0)
         done = False
         local_observations,active_queues = environment.reset()
@@ -164,7 +165,7 @@ def main():
                     agents[i].learn()
                     
                     
-            if hyperparameters['averaging_frequency'] and hyperparameters['federation_policy']:
+            if hyperparameters['averaging_frequency'] :
                 if episode % hyperparameters['averaging_frequency'] == 0:
                     federation_policy_maker.average_weights(agents= agents)
             
@@ -172,9 +173,11 @@ def main():
                     
             local_observations,active_queues  = local_observations_,active_queues_
             
-        champion_status = bookkeeper.reset_episode(episode,agents[0].get_epsilon())
+        bookkeeper.reset_episode(agents[0].get_epsilon())
+        
+        champion_status,total_episodes = bookkeeper.get_champion(episode)
         for i in range(len(agents)):
-            agents[i].store_champion(champion_status[i],episode)
+            agents[i].store_champion(champion_status[i],total_episodes)
 
     bookkeeper.plot_metrics()
     
