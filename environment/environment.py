@@ -134,7 +134,7 @@ class Environment:
                
 
                     
-        if self.current_time < self.episode_time_end: 
+        if self.current_time < self.episode_time: 
             self.bitarrive = np.random.uniform(self.min_bit_arrive, self.max_bit_arrive, size= self.number_of_servers) 
             self.bitarrive = self.bitarrive * (np.random.uniform(0, 1, size=[self.number_of_servers])< self.task_arrive_probability)
         else:
