@@ -18,7 +18,8 @@ class DeepQNetwork(nn.Module):
                  number_of_actions,
                  hidden_layers,
                  lstm_layers,
-                 dueling):
+                 dueling,
+                 dropout_rate):
         super(DeepQNetwork,self).__init__()
 
         self.state_dimensions = state_dimensions
@@ -36,6 +37,7 @@ class DeepQNetwork(nn.Module):
         for next_layer_size in hidden_layers:
             layers.append(nn.Linear(last_layer_size, next_layer_size))
             layers.append(nn.ReLU())
+            layers.append(nn.Dropout(dropout_rate))
             last_layer_size = next_layer_size
 
         self.sequential  = nn.Sequential(*layers)
@@ -84,6 +86,7 @@ class Agent(DescisionMakerBase):
                 device,
                 checkpoint_folder,
                 gamma,
+                dropout_rate,
                 epsilon,
                 epsilon_end,
                 local_action_probability,
@@ -136,7 +139,8 @@ class Agent(DescisionMakerBase):
                                         number_of_actions=self.number_of_actions,
                                         hidden_layers=self.hidden_layers,
                                         lstm_layers=self.lstm_layers,
-                                        dueling=self.dueling).to(self.device)
+                                        dueling=self.dueling,
+                                        dropout_rate=dropout_rate).to(self.device)
     if read_checkpoint:
       self.load_model()
     self.Q_target_network = copy.deepcopy(self.Q_eval_network).to(self.device)
@@ -185,6 +189,7 @@ class Agent(DescisionMakerBase):
     
 
   def choose_action(self,observation,lstm_state):
+    self.Q_eval_network.eval()
     with torch.no_grad():
       self.lstm_history.append(lstm_state)
       if np.random.uniform() > self.epsilon:
@@ -222,6 +227,9 @@ class Agent(DescisionMakerBase):
       return
     if self.memory_counter <= self.batch_size+self.lstm_time_step:
       return 
+    
+    self.Q_eval_network.train()
+
     self.learn_step_counter +=1
     if self.learn_step_counter % self.replace_target_iter == 0:
       self.Q_target_network.load_state_dict(self.Q_eval_network.state_dict())

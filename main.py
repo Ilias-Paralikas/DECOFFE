@@ -130,6 +130,7 @@ def main():
                     epsilon=hyperparameters['epsilon'],
                     train_in_exploit_state = args.train_in_exploit_state,
                     champion_file = champion_file,
+                    dropout_rate=  hyperparameters['dropout_rate'],
                     hyperparameters=hyperparameters)
                     
             for i in range(number_of_servers)]

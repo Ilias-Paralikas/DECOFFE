@@ -189,9 +189,11 @@ class Bookkeeper:
         plt.savefig(f'{self.run_folder}/{key}_moving_average.png')
         plt.close()
         
-        self.plot_actions()
+        
     def plot_metrics(self):
         for key in self.metrics.keys():
             self.plot_and_save(key)
             self.plot_and_save_moving_avg(key)
+        self.plot_actions()
+
         
