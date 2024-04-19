@@ -13,6 +13,8 @@ class DescisionMakerBase():
     pass
   def get_epsilon(self, *args, **kwargs):
     return -1
+  def get_learning_rate(self, *args, **kwargs):
+    return -1
   def store_champion(self, *args, **kwargs):
     pass
   def average_Weights(self,*args, **kwargs):

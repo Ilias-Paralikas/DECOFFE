@@ -47,6 +47,7 @@ class Bookkeeper:
             self.metrics['task_drop_ratio_history'] =[]
             self.metrics['rewards_history'] =[]
             self.metrics['epsilon_history'] =[1.0]
+            self.metrics['lr_history'] =[hyperparameters['learning_rate']]
             self.metrics['champion_score']  = float('-inf')
 
 
@@ -61,7 +62,7 @@ class Bookkeeper:
         self.not_plotable_metrics  = ['champion_score']
         
 
-    def reset_episode(self,epsilon):
+    def reset_episode(self,epsilon,learning_rate):
         episode_tasks_arrived = np.vstack(self.tasks_arrived)
         episode_tasks_arrived = np.sum(episode_tasks_arrived,axis=0)
         episode_tasks_drop = np.vstack(self.tasks_dropped)
@@ -74,6 +75,7 @@ class Bookkeeper:
         self.metrics['rewards_history'].append(episode_rewards)
           
         self.metrics['epsilon_history'].append(epsilon)
+        self.metrics['lr_history'].append(learning_rate)
         
       
         with open(self.metrics_folder, 'wb') as f:
@@ -120,6 +122,8 @@ class Bookkeeper:
         return self.hyperparameters_file,self.checkpoint_folder
     def get_epsilon(self):
         return self.metrics['epsilon_history'][-1]
+    def get_learning_rate(self):   
+        return self.metrics['lr_history'][-1]
     def plot_actions(self):
         actions = np.concatenate(self.last_actions)
         actions = [num for num in actions if num != -1]

@@ -19,7 +19,7 @@ def main():
 
         
         parser.add_argument('--episodes', type=int, default=5, help='Integer')
-        parser.add_argument('--number_of_servers', type=int, default=3, help='Integer')
+        parser.add_argument('--number_of_servers', type=int, default=2, help='Integer')
         parser.add_argument('--cloud_computational_capacity', type=float, default=30, help='Float')
 
         # More hyperparameters
@@ -35,7 +35,7 @@ def main():
         # Neural network hy     perparameters
         parser.add_argument('--hidden_layers', type=str, default='20,20,20', help='comma-separated integers')
         parser.add_argument('--lstm_layers', type=int, default=20, help='Integer')
-        parser.add_argument('--epsilon_decrement', type=float, default=1e-5, help='Float')
+        parser.add_argument('--epsilon_decrement_per_episode', type=float, default=1e-3, help='Float')
         parser.add_argument('--batch_size', type=int, default=64, help='Integer')
         parser.add_argument('--learning_rate', type=float, default=1e-4, help='Float')
         parser.add_argument('--memory_size', type=int, default=int(1e4), help='Integer')
@@ -56,12 +56,14 @@ def main():
         parser.add_argument('--federation_policy', type=str, default='None')
         
         parser.add_argument('--static_environment',type=int, default=0, help='This argument specifies whether the environment is static or not. If this argument is set to a non-zero integer, the environment will be reset to its initial state every --static episodes.')
-
+        parser.add_argument('--lr_schedueler_gamma',type=float, default=0.99999)
         args = parser.parse_args()
         if args.validate:
                 epsilon = 0.0
         else:
                 epsilon = 1.0
+        
+        epsilon_decrement_per_episode = args.epsilon_decrement_per_episode/(args.episode_time +args.timeout_delay)
                 
 
         
@@ -80,7 +82,7 @@ def main():
         'task_computational_density': args.task_computational_density,
         'hidden_layers': hidden_layers,
         'lstm_layers': args.lstm_layers,
-        'epsilon_decrement': args.epsilon_decrement,
+        'epsilon_decrement_per_episode': epsilon_decrement_per_episode,
         'batch_size': args.batch_size,
         'learning_rate': args.learning_rate,
         'memory_size': args.memory_size,
@@ -100,7 +102,8 @@ def main():
         'averaging_frequency': args.averaging_frequency,
         'federation_policy': args.federation_policy,
         'static_environment' :args.static_environment,
-        'dropout_rate': args.dropout_rate
+        'dropout_rate': args.dropout_rate,
+        'lr_schedueler_gamma'   : args.lr_schedueler_gamma
         }
 
 

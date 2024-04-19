@@ -41,7 +41,7 @@ def main():
     print(device)
     parser = argparse.ArgumentParser(description="Process some integers.")
  
-    parser.add_argument('--resume_run', default=None,type=str, nargs='?', help='This argument is used to specify the run to resume. If this argument is provided, the script will attempt to resume a previous run with the given name. If the run does not exist, the script will print an error message and exit.')
+    parser.add_argument('--resume_run', default='run_0',type=str, nargs='?', help='This argument is used to specify the run to resume. If this argument is provided, the script will attempt to resume a previous run with the given name. If the run does not exist, the script will print an error message and exit.')
     parser.add_argument('--episodes', default=10,type=int,  help='This argument specifies the number of episodes to run in the simulation. The default value is 10.')
     parser.add_argument('--average_window',default=500, type=int,   help=': This argument specifies the window size for averaging the results for plotting. The default value is 500.')
     parser.add_argument('--log_folder' ,type=str,default='bookkeeping/log_folder',help=' This argument specifies the directory where the logs will be stored. The default directory is "bookkeeping/log_folder"')
@@ -63,6 +63,7 @@ def main():
         with open(hyperparameters_file, 'r') as file:
             hyperparameters = json.load(file)
         hyperparameters['epsilon'] = bookkeeper.get_epsilon()
+        hyperparameters['learning_rate'] = bookkeeper.get_learning_rate()
         hyperparameters['episodes'] = args.episodes
     else:
         hyperparameters_file = args.hyperparameters_file
@@ -71,9 +72,9 @@ def main():
         with open(hyperparameters_file, 'r') as file:
             hyperparameters = json.load(file)
         bookkeeper  =Bookkeeper(resume_run=resume_run,
-                                hyperparameters=hyperparameters,
                                 average_window=args.average_window,
-                                log_folder=args.log_folder)
+                                log_folder=args.log_folder,
+                                hyperparameters=hyperparameters)
         hyperparameters_file,checkpoint_folder = bookkeeper.get_folder_names()
 
     bookkeeper.start_championship(championship_epsilon_start=hyperparameters['championship_epsilon_start'],
@@ -113,7 +114,7 @@ def main():
                     number_of_actions=number_of_actions,
                     hidden_layers =hyperparameters['hidden_layers'],
                     lstm_layers = hyperparameters['lstm_layers'],
-                    epsilon_decrement =hyperparameters['epsilon_decrement'],
+                    epsilon_decrement =hyperparameters['epsilon_decrement_per_episode'],
                     batch_size =hyperparameters['batch_size'],
                     learning_rate =hyperparameters['learning_rate'],
                     memory_size = hyperparameters['memory_size'],
@@ -131,6 +132,7 @@ def main():
                     train_in_exploit_state = args.train_in_exploit_state,
                     champion_file = champion_file,
                     dropout_rate=  hyperparameters['dropout_rate'],
+                    lr_schedueler_gamma = hyperparameters['lr_schedueler_gamma'],
                     hyperparameters=hyperparameters)
                     
             for i in range(number_of_servers)]
@@ -174,7 +176,7 @@ def main():
                     
             local_observations,active_queues  = local_observations_,active_queues_
             
-        bookkeeper.reset_episode(agents[0].get_epsilon())
+        bookkeeper.reset_episode(agents[0].get_epsilon(),agents[0].get_learning_rate())
         
         champion_status,total_episodes = bookkeeper.get_champion(episode)
         for i in range(len(agents)):

@@ -93,6 +93,7 @@ class Agent(DescisionMakerBase):
                 save_model_frequency,
                 champion_file,
                 train_in_exploit_state,
+                lr_schedueler_gamma,
                 read_checkpoint = True,
                 dueling=True,
                 *args, 
@@ -147,6 +148,8 @@ class Agent(DescisionMakerBase):
 
 
     self.optimizer = optimizer(self.Q_eval_network.parameters(),lr=learning_rate)
+    self.schedueler = torch.optim.lr_scheduler.ExponentialLR(self.optimizer,gamma=lr_schedueler_gamma)
+    
     self.loss_function =loss_function()
     
     
@@ -267,6 +270,7 @@ class Agent(DescisionMakerBase):
     loss = self.loss_function(q_target,q_eval)
     loss.backward()
     self.optimizer.step()
+    self.schedueler.step()
 
     self.epsilon = max(self.epsilon - self.epsilon_decrement, self.epsilon_end)
 
@@ -276,6 +280,9 @@ class Agent(DescisionMakerBase):
     
   def get_epsilon(self):
      return self.epsilon
+  
+  def get_learning_rate(self):
+    return self.optimizer.param_groups[0]['lr']
    
   def store_champion(self, is_champion,episode,*args, **kwargs):
     if is_champion:
