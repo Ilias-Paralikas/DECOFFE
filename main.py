@@ -41,7 +41,7 @@ def main():
     print(device)
     parser = argparse.ArgumentParser(description="Process some integers.")
  
-    parser.add_argument('--resume_run', default='run_0',type=str, nargs='?', help='This argument is used to specify the run to resume. If this argument is provided, the script will attempt to resume a previous run with the given name. If the run does not exist, the script will print an error message and exit.')
+    parser.add_argument('--resume_run', default=None,type=str, nargs='?', help='This argument is used to specify the run to resume. If this argument is provided, the script will attempt to resume a previous run with the given name. If the run does not exist, the script will print an error message and exit.')
     parser.add_argument('--episodes', default=10,type=int,  help='This argument specifies the number of episodes to run in the simulation. The default value is 10.')
     parser.add_argument('--average_window',default=500, type=int,   help=': This argument specifies the window size for averaging the results for plotting. The default value is 500.')
     parser.add_argument('--log_folder' ,type=str,default='bookkeeping/log_folder',help=' This argument specifies the directory where the logs will be stored. The default directory is "bookkeeping/log_folder"')
