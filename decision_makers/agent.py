@@ -157,7 +157,7 @@ class Agent(DescisionMakerBase):
     self.lstm_memory =np.zeros((self.memory_size, self.lstm_shape),dtype=np.float32)
     self.new_state_memory = np.zeros((self.memory_size, state_dimensions),dtype=np.float32)
     self.new_lstm_memory =np.zeros((self.memory_size, self.lstm_shape),dtype=np.float32)
-    self.reward_memory = np.zeros(self.memory_size,dtype=np.int8)
+    self.reward_memory = np.zeros(self.memory_size,dtype=np.float32)
     self.action_memory = np.zeros(self.memory_size,dtype=np.int64)
     self.terminal_memory= np.zeros(self.memory_size,dtype=bool)
 
