@@ -146,7 +146,7 @@ class Agent(DescisionMakerBase):
       self.load_model()
     self.Q_target_network = copy.deepcopy(self.Q_eval_network).to(self.device)
     self.Q_target_network.eval()
-
+    
     self.optimizer = optimizer(self.Q_eval_network.parameters(),lr=learning_rate)
     self.schedueler = torch.optim.lr_scheduler.ExponentialLR(self.optimizer,gamma=lr_schedueler_gamma)
     
@@ -192,7 +192,6 @@ class Agent(DescisionMakerBase):
     
 
   def choose_action(self,observation,lstm_state):
-    self.Q_eval_network.eval()
     with torch.no_grad():
       self.lstm_history.append(lstm_state)
       if np.random.uniform() > self.epsilon:
