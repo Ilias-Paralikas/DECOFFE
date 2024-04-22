@@ -267,7 +267,7 @@ class Agent(DescisionMakerBase):
     q_target_next = q_target_next * mask
     q_target = reward_batch + self.gamma * q_target_next
 
-    loss = self.loss_function(q_target,q_eval)
+    loss = self.loss_function(q_eval,q_target)
     loss.backward()
     self.optimizer.step()
     self.schedueler.step()
