@@ -62,7 +62,7 @@ class DeepQNetwork(nn.Module):
         if self.dueling:
             value = self.value_layer(sequential_output)
             advantage = self.advantage_layer(sequential_output)
-            q_values = value + (advantage - advantage.mean(dim=1, keepdim=True))
+            q_values = value + (advantage - torch.mean(advantage, dim=1, keepdim=True))
         else:
             q_values = self.output_layer(sequential_output)
         return q_values
@@ -255,7 +255,6 @@ class Agent(DescisionMakerBase):
 
 
     q_eval = self.Q_eval_network(state_batch, lstm_sequence_batch).gather(1, action_batch.unsqueeze(1)).squeeze(1)
-
     q_next_eval = self.Q_eval_network(next_state_batch, next_lstm_sequence_batch)
     next_actions = torch.argmax(q_next_eval, dim=1)
     q_next_target = self.Q_target_network(next_state_batch, next_lstm_sequence_batch)
