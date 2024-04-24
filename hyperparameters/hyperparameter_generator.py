@@ -19,7 +19,7 @@ def main():
 
         
         parser.add_argument('--episodes', type=int, default=5, help='Integer')
-        parser.add_argument('--number_of_servers', type=int, default=2, help='Integer')
+        parser.add_argument('--number_of_servers', type=int, default=5, help='Integer')
         parser.add_argument('--cloud_computational_capacity', type=float, default=30, help='Float')
 
         # More hyperparameters
@@ -27,7 +27,7 @@ def main():
         parser.add_argument('--timeout_delay', type=int, default=10, help='Integer')
         parser.add_argument('--max_bit_arrive', type=float, default=5.0, help='Float')
         parser.add_argument('--min_bit_arrive', type=float, default=2.0, help='Float')
-        parser.add_argument('--task_arrive_probability', type=float, default=0.7, help='Float between 0 and 1')
+        parser.add_argument('--task_arrive_probability', type=float, default=0.9, help='Float between 0 and 1')
         parser.add_argument('--delta_duration', type=float, default=0.1, help='Float')
         parser.add_argument('--task_drop_penalty_multiplier', type=float, default=4, help='Float')
         parser.add_argument('--task_computational_density', type=float, default=0.297, help='Float')
@@ -56,7 +56,7 @@ def main():
         parser.add_argument('--federation_policy', type=str, default='None')
         
         parser.add_argument('--static_environment',type=int, default=0, help='This argument specifies whether the environment is static or not. If this argument is set to a non-zero integer, the environment will be reset to its initial state every --static episodes.')
-        parser.add_argument('--lr_schedueler_gamma',type=float, default=0.99999)
+        parser.add_argument('--lr_schedueler_gamma',type=float, default=1)
         args = parser.parse_args()
         if args.validate:
                 epsilon = 0.0
