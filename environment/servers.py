@@ -58,10 +58,12 @@ class Server:
 
     def get_active_public_queues(self):
         active_queues =0
+        total_priority = 0
         for q in self.public_queues:
             if not q.is_empty():
                 active_queues +=1
-        return active_queues
+                total_priority += q.current_task.task_priority
+        return active_queues,total_priority
 
     def get_waiting_times(self):
         return  self.processing_queue.waiting_time,self.offloading_queue.waiting_time
@@ -92,9 +94,9 @@ class Server:
                 self.offloading_queue.add_task(local_task)
                 
         
-        active_queues= self.get_active_public_queues()
+        active_queues,total_priority= self.get_active_public_queues()
         if active_queues!=0:
-            distributed_computational_capacity = self.public_queues_computational_capacity/active_queues
+            distributed_computational_capacity = self.public_queues_computational_capacity/total_priority
         else:
             distributed_computational_capacity = 0
         for i,q in enumerate(self.public_queues):
