@@ -167,7 +167,7 @@ class Environment:
             
             
         active_queues =[s.get_active_public_queues()[0] for s in self.servers]           
-        active_queues.append(self.cloud.get_active_queues())     
+        active_queues.append(self.cloud.get_active_queues()[0])     
         observations = (local_observations,active_queues)
 
 
