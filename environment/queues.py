@@ -121,8 +121,10 @@ class PublicQueue(TaskQueue):
         reward = self.get_first_non_empty_element()
         if self.current_task.is_empty:
             return reward
-        self.current_task.remain -= computational_capacity / self.current_task.task_computational_density
-        self.queue_length -= computational_capacity / self.current_task.task_computational_density
+        computational_capacity =  computational_capacity  * self.current_task.task_priority 
+        task_processed = computational_capacity / self.current_task.task_computational_density
+        self.current_task.remain -=task_processed
+        self.queue_length -= task_processed
         if self.current_task.remain <=0 :   
             self.queue_length -= self.current_task.remain
             self.current_task.finish_task()

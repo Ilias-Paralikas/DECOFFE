@@ -4,7 +4,10 @@ import os
 NUMBER_OF_CLOUDS =1
 
 def comma_seperated_string_to_list(comma_seperated_String):
+        if comma_seperated_String is None:
+                return []
         return [int(x) for x in comma_seperated_String.split(',')]
+
 
 def main():
         parser = argparse.ArgumentParser(description='Script Configuration via Command Line')

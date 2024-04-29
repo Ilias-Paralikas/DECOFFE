@@ -19,7 +19,7 @@ class Environment:
                  delta_duration,
                  task_drop_penalty_multiplier,
                  task_computational_density,
-                 server_priorities = server_priorities,
+                 server_priorities,
                  local_variables = 3,
                  number_of_clouds =1):
         
