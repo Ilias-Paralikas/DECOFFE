@@ -7,6 +7,7 @@ class Task:
                 task_computational_density =None,
                 timeout_delay=None,
                 task_drop_penalty_multiplier=None,
+                task_priority =None,
                 origin_server_id = None,
                 target_server_id = None):
         if size :
@@ -22,7 +23,7 @@ class Task:
          
             self.origin_server_id=origin_server_id
             self.target_server_id=target_server_id
-        
+            self.task_priority = task_priority
         else:
             self.is_empty =True
                 
@@ -47,6 +48,7 @@ class Task:
                     task_computational_density=self.task_computational_density,
                     task_drop_penalty_multiplier= self.task_drop_penalty_multiplier,
                     origin_server_id= self.origin_server_id,
-                    target_server_id= self.target_server_id)
+                    target_server_id= self.target_server_id,
+                    task_priority = self.task_priority)
         
       

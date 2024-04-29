@@ -19,6 +19,7 @@ class Environment:
                  delta_duration,
                  task_drop_penalty_multiplier,
                  task_computational_density,
+                 server_priorities = server_priorities,
                  local_variables = 3,
                  number_of_clouds =1):
         
@@ -50,6 +51,7 @@ class Environment:
         
 
         self.servers =[Server(id=i,
+                              server_priority = server_priorities[i],
                               number_of_servers = self.number_of_servers,
                               private_queue_computational_capacity = self.servers_private_queue_computational_capacities[i],
                               public_queues_computational_capacity = self.servers_public_queues_computational_capacities[i],
@@ -119,6 +121,7 @@ class Environment:
             else:
                 action = actions[server.id]
                 task = Task(size=task_size,
+                            task_priority = server.server_priority,
                             timeout_delay=self.timeout_delay,
                             task_drop_penalty_multiplier=self.task_drop_penalty_multiplier,
                             task_computational_density=self.task_computational_density) 

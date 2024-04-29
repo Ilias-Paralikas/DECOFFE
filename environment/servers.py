@@ -7,11 +7,13 @@ class Server:
     def __init__(self,
                  id,
                  number_of_servers ,
+                 server_priority,
                  private_queue_computational_capacity,
                  public_queues_computational_capacity,
                  offloading_queue_transmision_capacities,
                  number_of_clouds=1):
         self.id=id
+        self.server_priority = server_priority
         self.number_of_servers=  number_of_servers
         self.private_queue_computational_capacity = private_queue_computational_capacity
         self.public_queues_computational_capacity = public_queues_computational_capacity
