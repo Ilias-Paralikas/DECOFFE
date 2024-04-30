@@ -26,6 +26,7 @@ class Environment:
         
         self.number_of_servers = len(servers_private_queues_computational_capacities)
         self.number_of_clouds  = number_of_clouds
+        self.local_variables = local_variables
         assert len(servers_private_queues_computational_capacities) == len(servers_public_queues_computational_capacities)
         assert transmission_capacities.shape[0] == len(servers_private_queues_computational_capacities)
         assert transmission_capacities.shape[1] == len(servers_private_queues_computational_capacities)-1 + self.number_of_clouds
@@ -160,7 +161,7 @@ class Environment:
             for s in self.servers:
                 if s.id  != server.id:
                     length_index = server.public_queue_hash_map[s.id]
-                    local_observations[server.id][3+length_index] = s.get_public_queue_server_length(server.id)
+                    local_observations[server.id][self.local_variables+length_index] = s.get_public_queue_server_length(server.id)
             
             local_observations[server.id][-1] = self.cloud.public_queues[server.id].queue_length
             
