@@ -34,7 +34,7 @@ def main():
         parser.add_argument('--delta_duration', type=float, default=0.1, help='Float')
         parser.add_argument('--task_drop_penalty_multiplier', type=float, default=4, help='Float')
         parser.add_argument('--task_computational_density', type=float, default=0.297, help='Float')
-        parser.add_argument('--advanced_priorities', type=str, default=None, help='comma-separated integers')
+        parser.add_argument('--priorities', type=str, default=None, help='comma-separated integers')
 
         # Neural network hy     perparameters
         parser.add_argument('--hidden_layers', type=str, default='1024,1024,1024', help='comma-separated integers')
@@ -70,10 +70,10 @@ def main():
         epsilon_decrement_per_episode = args.epsilon_decrement_per_episode/(args.episode_time +args.timeout_delay)
                 
     
-        advanced_priorities  = comma_seperated_string_to_list(args.advanced_priorities)
+        priorities  = comma_seperated_string_to_list(args.priorities)
         server_priorities = [1 for _ in range(args.number_of_servers)]
-        for i in range(len(advanced_priorities)):
-                server_priorities[i] = advanced_priorities[i]
+        for i in range(len(priorities)):
+                server_priorities[i] = priorities[i]
                 
         
         hidden_layers = comma_seperated_string_to_list(args.hidden_layers)
