@@ -58,7 +58,7 @@ def main():
         parser.add_argument('--dropout_rate', default=0.5,type= float)
         parser.add_argument('--averaging_frequency', default=0,type= int,help="This argument is used to specify the frequency at which the weights of the agents are averaged. If this argument is provided, the weights of the agents will be averaged every averaging_frequency episodes. The default value is 0, meaning no averaging")
         parser.add_argument('--federation_policy', type=str, default='None')
-        
+        parser.add_argument('--update_weight_percentage', type=float, default=1.0, help='This argument is used to specify the percentage of the weights that will be updated in the federation. The default value is 0.5, meaning that 50% of the weights will be updated in the federation.')
         parser.add_argument('--static_environment',type=int, default=0, help='This argument specifies whether the environment is static or not. If this argument is set to a non-zero integer, the environment will be reset to its initial state every --static episodes.')
         parser.add_argument('--lr_schedueler_gamma',type=float, default=1)
         args = parser.parse_args()
@@ -113,7 +113,8 @@ def main():
         'static_environment' :args.static_environment,
         'dropout_rate': args.dropout_rate,
         'lr_schedueler_gamma'   : args.lr_schedueler_gamma,
-        'server_priorities': server_priorities
+        'server_priorities': server_priorities,
+        'update_weight_percentage': args.update_weight_percentage,
         }
 
 

@@ -81,6 +81,7 @@ class Agent(DescisionMakerBase):
                 memory_size,
                 lstm_time_step,
                 replace_target_iter,
+                update_weight_percentage,
                 optimizer,
                 loss_function,
                 device,
@@ -123,6 +124,8 @@ class Agent(DescisionMakerBase):
     self.memory_counter= 0
     self.learn_step_counter = 0
     self.replace_target_iter = replace_target_iter
+    self.update_weight_percentage = update_weight_percentage
+
     self.dueling = dueling
     
     
@@ -213,6 +216,13 @@ class Agent(DescisionMakerBase):
 
   
   def learn(self):
+    def weighted_add_state_dicts():
+        eval_state_dict = self.Q_eval_network.state_dict()
+        target_state_dict = self.Q_target_network.state_dict()
+        new_state_dict = {}
+        for key in target_state_dict.keys():
+            new_state_dict[key] = self.update_weight_percentage*eval_state_dict[key]  + target_state_dict[key] * (1 - self.update_weight_percentage)
+        return new_state_dict
 
     def get_lstm_sequence(index):
         start_index = max(0, index - self.lstm_time_step + 1)
@@ -233,7 +243,8 @@ class Agent(DescisionMakerBase):
 
     self.learn_step_counter +=1
     if self.learn_step_counter % self.replace_target_iter == 0:
-      self.Q_target_network.load_state_dict(self.Q_eval_network.state_dict())
+      new_target_weights =  weighted_add_state_dicts()
+      self.Q_target_network.load_state_dict(new_target_weights)
 
     self.optimizer.zero_grad()
     

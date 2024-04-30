@@ -134,6 +134,7 @@ def main():
                     champion_file = champion_file,
                     dropout_rate=  hyperparameters['dropout_rate'],
                     lr_schedueler_gamma = hyperparameters['lr_schedueler_gamma'],
+                    update_weight_percentage = hyperparameters['update_weight_percentage'],
                     hyperparameters=hyperparameters)
                     
             for i in range(number_of_servers)]
