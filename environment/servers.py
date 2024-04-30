@@ -1,5 +1,5 @@
 import numpy as np
-from .queues import PublicQueue,OffloadingQueue,ProcessingQueue
+from .queues import OffloadingQueue,ProcessingQueue,PublicQueueManager
 
 
 
@@ -45,39 +45,26 @@ class Server:
         assert len(offloading_queue_transmision_capacities) == number_of_servers
         
         self.processing_queue = ProcessingQueue(self.private_queue_computational_capacity)
-        self.public_queues = [PublicQueue() for _ in range(self.number_of_servers-1)]
+        self.public_queue_manager = PublicQueueManager(id= id,
+                                                       number_of_servers=number_of_servers,
+                                                       number_of_supporting_servers=number_of_servers-1,
+                                                       computational_capacity=public_queues_computational_capacity,
+                                                       public_queue_hash_map=self.public_queue_hash_map,
+                                                       reward_hash_map=self.reward_hash_map)
+        
         self.offloading_queue = OffloadingQueue()
         self.current_time=0
 
     def reset(self):
         self.current_time=0
         self.processing_queue.reset()
-        for q in self.public_queues:
-            q.reset()
+        self.public_queue_manager.reset()
         self.offloading_queue.reset()
-
-    def get_active_public_queues(self):
-        active_queues =0
-        total_priority = 0
-        for q in self.public_queues:
-            if not q.is_empty():
-                active_queues +=1
-                total_priority += q.current_task.task_priority
-        return active_queues,total_priority
 
     def get_waiting_times(self):
         return  self.processing_queue.waiting_time,self.offloading_queue.waiting_time
     
-    def get_public_queue_server_length(self,server_id):
-        public_queue_id = self.public_queue_hash_map[server_id]
-        return self.public_queues[public_queue_id].queue_length
     
-    def add_offloaded_tasks(self,recieved_tasks=[]):
-        for task in recieved_tasks:
-            assert task.target_server_id == self.id
-            origin_server_id = task.origin_server_id
-            destination_public_queue = self.public_queue_hash_map[origin_server_id]
-            self.public_queues[destination_public_queue].add_task(task)
     
     def step(self,action=None,local_task=None):
         offloaded_rewards =np.zeros(self.number_of_servers)
@@ -94,16 +81,7 @@ class Server:
                 self.offloading_queue.add_task(local_task)
                 
         
-        active_queues,total_priority= self.get_active_public_queues()
-        if active_queues!=0:
-            distributed_computational_capacity = self.public_queues_computational_capacity/total_priority
-        else:
-            distributed_computational_capacity = 0
-        for i,q in enumerate(self.public_queues):
-            reward_server = self.reward_hash_map[i]
-            offloaded_rewards[reward_server] = q.process(distributed_computational_capacity)
-        
-        
+        offloaded_rewards += self.public_queue_manager.step()
         
         pocessing_reward= self.processing_queue.process()
         transmited_task, transmission_reward = self.offloading_queue.transmit()

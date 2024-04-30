@@ -109,7 +109,7 @@ class Environment:
         rewards = self.cloud.step(self.cloud_transmissions)
         offloaded_rewards  = rewards.copy()
         for target_server,tasks in self.horizontal_transmissions.items():
-            self.servers[target_server].add_offloaded_tasks(tasks)
+            self.servers[target_server].public_queue_manager.add_tasks(tasks)
         
         
         self.reset_tasks_to_be_transmited()
@@ -161,17 +161,17 @@ class Environment:
             for s in self.servers:
                 if s.id  != server.id:
                     length_index = server.public_queue_hash_map[s.id]
-                    local_observations[server.id][self.local_variables+length_index] = s.get_public_queue_server_length(server.id)
+                    local_observations[server.id][self.local_variables+length_index] = s.public_queue_manager.get_public_queue_server_length(server.id)
             
-            local_observations[server.id][-1] = self.cloud.public_queues[server.id].queue_length
+            local_observations[server.id][-1] = self.cloud.public_queues_manager.get_public_queue_server_length(server.id)
             
         self.current_time +=1
         rewards   = rewards/(self.task_drop_penalty_multiplier*self.timeout_delay)
         offloaded_rewards = offloaded_rewards/(self.task_drop_penalty_multiplier*self.timeout_delay)
             
             
-        active_queues =[s.get_active_public_queues()[0] for s in self.servers]           
-        active_queues.append(self.cloud.get_active_queues()[0])     
+        active_queues =[s.public_queue_manager.get_active_queues()[0] for s in self.servers]           
+        active_queues.append(self.cloud.public_queues_manager.get_active_queues()[0])     
         observations = (local_observations,active_queues)
 
 

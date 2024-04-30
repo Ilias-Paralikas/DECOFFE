@@ -1,7 +1,7 @@
 import queue
 from .task import Task
 import math
-
+import numpy as np
 
 class TaskQueue:
     def __init__(self):
@@ -131,3 +131,56 @@ class PublicQueue(TaskQueue):
             reward -=  self.current_time-self.current_task.arrival_time+1
         return reward
                     
+
+
+class PublicQueueManager():
+    def __init__(self,
+                 id,
+                 number_of_servers,
+                 number_of_supporting_servers,
+                 computational_capacity,
+                 public_queue_hash_map,
+                 reward_hash_map):
+        self.id = id
+        self.number_of_servers = number_of_servers
+        self.number_of_supporting_servers = number_of_supporting_servers
+        self.computational_capacity = computational_capacity
+        self.public_queues = [PublicQueue() for _ in range(self.number_of_supporting_servers)]
+        self.public_queue_hash_map= public_queue_hash_map
+        self.reward_hash_map =reward_hash_map
+    
+    def reset(self):
+        for q in self.public_queues:
+            q.reset()
+    
+    def get_public_queue_server_length(self,server_id):
+        public_queue_id = self.public_queue_hash_map[server_id]
+        return self.public_queues[public_queue_id].queue_length
+    
+    def get_active_queues(self):
+        active_queues =0
+        total_priority =0
+        for q in self.public_queues:
+            if not q.is_empty():
+                active_queues +=1
+                total_priority += q.current_task.task_priority
+        return active_queues,total_priority
+        
+    def add_tasks(self,recieved_tasks=[]):
+        for task in recieved_tasks:
+            assert task.target_server_id == self.id
+            origin_server_id = task.origin_server_id
+            destination_public_queue = self.public_queue_hash_map[origin_server_id]
+            self.public_queues[destination_public_queue].add_task(task)
+    
+    def step(self):
+        rewards =np.zeros(self.number_of_servers)
+        active_queues,total_priority= self.get_active_queues()
+        if active_queues!=0:
+            distributed_computational_capacity = self.computational_capacity/total_priority
+        else:
+            distributed_computational_capacity = 0
+        for i,q in enumerate(self.public_queues):
+            reward_server = self.reward_hash_map[i]
+            rewards[reward_server] = q.process(distributed_computational_capacity)
+        return rewards
