@@ -80,7 +80,7 @@ class Server:
             self.public_queues[destination_public_queue].add_task(task)
     
     def step(self,action=None,local_task=None):
-        rewards =np.zeros(self.number_of_servers)
+        offloaded_rewards =np.zeros(self.number_of_servers)
 
         if local_task:
             local_task.arrival_time=self.current_time
@@ -101,15 +101,15 @@ class Server:
             distributed_computational_capacity = 0
         for i,q in enumerate(self.public_queues):
             reward_server = self.reward_hash_map[i]
-            rewards[reward_server] = q.process(distributed_computational_capacity)
+            offloaded_rewards[reward_server] = q.process(distributed_computational_capacity)
         
         
         
         pocessing_reward= self.processing_queue.process()
         transmited_task, transmission_reward = self.offloading_queue.transmit()
-        
-        rewards[self.id] += pocessing_reward
-        rewards[self.id] += transmission_reward
+        offloaded_rewards[self.id] += transmission_reward
 
+        local_rewards = np.zeros(self.number_of_servers)
+        local_rewards[self.id] = pocessing_reward
         self.current_time +=1
-        return transmited_task, rewards
+        return transmited_task,local_rewards, offloaded_rewards

@@ -106,7 +106,7 @@ class Environment:
             done = False
         
         rewards = self.cloud.step(self.cloud_transmissions)
-
+        offloaded_rewards  = rewards.copy()
         for target_server,tasks in self.horizontal_transmissions.items():
             self.servers[target_server].add_offloaded_tasks(tasks)
         
@@ -117,7 +117,7 @@ class Environment:
         for server in self.servers:
             task_size = self.bitarrive[server.id] 
             if task_size  ==0:
-                transmited_task,server_rewards = server.step()
+                transmited_task,local_rewards,offloaded_server_rewards = server.step()
             else:
                 action = actions[server.id]
                 task = Task(size=task_size,
@@ -125,8 +125,10 @@ class Environment:
                             timeout_delay=self.timeout_delay,
                             task_drop_penalty_multiplier=self.task_drop_penalty_multiplier,
                             task_computational_density=self.task_computational_density) 
-                transmited_task,server_rewards = server.step(action,task)
-            rewards += server_rewards
+                transmited_task,local_rewards,offloaded_server_rewards = server.step(action,task)
+            offloaded_rewards += offloaded_server_rewards
+            rewards += local_rewards
+            rewards += offloaded_server_rewards
             if transmited_task:
                 # 0 to n-1 are the servers n is the cloud
                 if transmited_task.target_server_id ==self.number_of_servers:
@@ -136,6 +138,7 @@ class Environment:
                     self.horizontal_transmissions[target_server].append(transmited_task)
                
 
+        old_bitarrive = self.bitarrive
                     
         if self.current_time < self.episode_time: 
             self.bitarrive = np.random.uniform(self.min_bit_arrive, self.max_bit_arrive, size= self.number_of_servers) 
@@ -163,7 +166,7 @@ class Environment:
             
         self.current_time +=1
         rewards   = rewards/(self.task_drop_penalty_multiplier*self.timeout_delay)
-        
+        offloaded_rewards = offloaded_rewards/(self.task_drop_penalty_multiplier*self.timeout_delay)
             
             
         active_queues =[s.get_active_public_queues()[0] for s in self.servers]           
@@ -172,10 +175,14 @@ class Environment:
 
 
         info = {}
-        info['tasks_arrived'] = np.where(self.bitarrive==0,0,1)
+        info['tasks_arrived'] = np.where(old_bitarrive==0,0,1)
         info['tasks_dropped'] = -np.ceil(rewards)
         info['rewards'] = rewards
         info['actions'] = actions
-        info['bitarrive'] = self.bitarrive
+        info['bitarrive'] = old_bitarrive
+        info['offloaded_tasks'] = np.array(np.logical_and(old_bitarrive,actions),dtype=np.int32)
+        info['offloaded_rewards'] = offloaded_rewards
+        info['offloaded_drop'] = -np.ceil(offloaded_rewards)
+
 
         return observations, rewards, done, info

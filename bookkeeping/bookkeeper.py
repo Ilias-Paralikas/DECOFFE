@@ -45,7 +45,9 @@ class Bookkeeper:
         else:
             self.metrics ={}
             self.metrics['task_drop_ratio_history'] =[]
+            self.metrics['offloaded_drop_ratio_history'] =[]
             self.metrics['rewards_history'] =[]
+            self.metrics['offloaded_rewards_history'] = []
             self.metrics['epsilon_history'] =[1.0]
             self.metrics['lr_history'] =[hyperparameters['learning_rate']]
             self.metrics['champion_score']  = float('-inf')
@@ -53,8 +55,11 @@ class Bookkeeper:
 
     
         self.tasks_arrived = []
-        self.tasks_dropped =[]        
+        self.tasks_offloaded = []
+        self.tasks_dropped =[]    
+        self.tasks_offloaded_dropped = []    
         self.rewards = []
+        self.offloaded_rewards = []
         self.actions = []
         
         os.makedirs(self.checkpoint_folder,exist_ok=True)
@@ -70,9 +75,22 @@ class Bookkeeper:
         episode_task_drop_ratio = episode_tasks_drop/episode_tasks_arrived
         self.metrics['task_drop_ratio_history'].append(episode_task_drop_ratio)
         
+        
+        episode_tasks_offloaded = np.vstack(self.tasks_offloaded)
+        episode_tasks_offloaded = np.sum(episode_tasks_offloaded,axis=0)
+        episode_tasks_offloaded_drop = np.vstack(self.tasks_offloaded_dropped)
+        episode_tasks_offloaded_drop = np.sum(episode_tasks_offloaded_drop,axis=0)
+        episode_offloaded_drop_ratio = episode_tasks_offloaded_drop/episode_tasks_offloaded
+        self.metrics['offloaded_drop_ratio_history'].append(episode_offloaded_drop_ratio)
+        
         episode_rewards = np.vstack(self.rewards)
         episode_rewards=  np.sum(episode_rewards,axis=0)
         self.metrics['rewards_history'].append(episode_rewards)
+        
+        episode_offloaded_rewards = np.vstack(self.offloaded_rewards)
+        episode_offloaded_rewards=  np.sum(episode_offloaded_rewards,axis=0)
+        self.metrics['offloaded_rewards_history'].append(episode_offloaded_rewards)
+        
           
         self.metrics['epsilon_history'].append(epsilon)
         self.metrics['lr_history'].append(learning_rate)
@@ -82,8 +100,11 @@ class Bookkeeper:
             pickle.dump(self.metrics, f)
             
         self.tasks_arrived = []
+        self.tasks_offloaded = []
         self.tasks_dropped =[]
+        self.tasks_offloaded_dropped = []
         self.rewards = []
+        self.offloaded_rewards = []
         self.last_actions = self.actions
         self.actions = []
         score, average_score,drop_ratio,epsilon = np.mean(self.metrics['rewards_history'][-1]), np.mean(self.metrics['rewards_history'][-self.average_window:]),np.mean(self.metrics['task_drop_ratio_history'][-1]),self.metrics['epsilon_history'][-1]
@@ -109,8 +130,11 @@ class Bookkeeper:
 
     def store_timestep(self,info):
         self.tasks_arrived.append(info['tasks_arrived'])
+        self.tasks_offloaded.append(info['offloaded_tasks'])
         self.tasks_dropped.append(info['tasks_dropped'])
+        self.tasks_offloaded_dropped.append(info['offloaded_drop'])
         self.rewards.append(info['rewards'])
+        self.offloaded_rewards.append(info['offloaded_rewards'])
         valid_actions  =  [info['actions'][i] if info['bitarrive'][i] !=0 else -1 for i in range(len(info['bitarrive']))]
         self.actions.append(valid_actions)
             
