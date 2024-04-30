@@ -7,11 +7,13 @@ class Server:
     def __init__(self,
                  id,
                  number_of_servers ,
+                 server_priority,
                  private_queue_computational_capacity,
                  public_queues_computational_capacity,
                  offloading_queue_transmision_capacities,
                  number_of_clouds=1):
         self.id=id
+        self.server_priority = server_priority
         self.number_of_servers=  number_of_servers
         self.private_queue_computational_capacity = private_queue_computational_capacity
         self.public_queues_computational_capacity = public_queues_computational_capacity
@@ -56,10 +58,12 @@ class Server:
 
     def get_active_public_queues(self):
         active_queues =0
+        total_priority = 0
         for q in self.public_queues:
             if not q.is_empty():
                 active_queues +=1
-        return active_queues
+                total_priority += q.current_task.task_priority
+        return active_queues,total_priority
 
     def get_waiting_times(self):
         return  self.processing_queue.waiting_time,self.offloading_queue.waiting_time
@@ -76,7 +80,7 @@ class Server:
             self.public_queues[destination_public_queue].add_task(task)
     
     def step(self,action=None,local_task=None):
-        rewards =np.zeros(self.number_of_servers)
+        offloaded_rewards =np.zeros(self.number_of_servers)
 
         if local_task:
             local_task.arrival_time=self.current_time
@@ -90,22 +94,22 @@ class Server:
                 self.offloading_queue.add_task(local_task)
                 
         
-        active_queues= self.get_active_public_queues()
+        active_queues,total_priority= self.get_active_public_queues()
         if active_queues!=0:
-            distributed_computational_capacity = self.public_queues_computational_capacity/active_queues
+            distributed_computational_capacity = self.public_queues_computational_capacity/total_priority
         else:
             distributed_computational_capacity = 0
         for i,q in enumerate(self.public_queues):
             reward_server = self.reward_hash_map[i]
-            rewards[reward_server] = q.process(distributed_computational_capacity)
+            offloaded_rewards[reward_server] = q.process(distributed_computational_capacity)
         
         
         
         pocessing_reward= self.processing_queue.process()
         transmited_task, transmission_reward = self.offloading_queue.transmit()
-        
-        rewards[self.id] += pocessing_reward
-        rewards[self.id] += transmission_reward
+        offloaded_rewards[self.id] += transmission_reward
 
+        local_rewards = np.zeros(self.number_of_servers)
+        local_rewards[self.id] = pocessing_reward
         self.current_time +=1
-        return transmited_task, rewards
+        return transmited_task,local_rewards, offloaded_rewards

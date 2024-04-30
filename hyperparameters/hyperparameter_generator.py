@@ -4,7 +4,10 @@ import os
 NUMBER_OF_CLOUDS =1
 
 def comma_seperated_string_to_list(comma_seperated_String):
+        if comma_seperated_String is None:
+                return []
         return [int(x) for x in comma_seperated_String.split(',')]
+
 
 def main():
         parser = argparse.ArgumentParser(description='Script Configuration via Command Line')
@@ -27,17 +30,18 @@ def main():
         parser.add_argument('--timeout_delay', type=int, default=10, help='Integer')
         parser.add_argument('--max_bit_arrive', type=float, default=5.0, help='Float')
         parser.add_argument('--min_bit_arrive', type=float, default=2.0, help='Float')
-        parser.add_argument('--task_arrive_probability', type=float, default=0.9, help='Float between 0 and 1')
+        parser.add_argument('--task_arrive_probability', type=float, default=0.7, help='Float between 0 and 1')
         parser.add_argument('--delta_duration', type=float, default=0.1, help='Float')
         parser.add_argument('--task_drop_penalty_multiplier', type=float, default=4, help='Float')
         parser.add_argument('--task_computational_density', type=float, default=0.297, help='Float')
+        parser.add_argument('--advanced_priorities', type=str, default=None, help='comma-separated integers')
 
         # Neural network hy     perparameters
-        parser.add_argument('--hidden_layers', type=str, default='256,256', help='comma-separated integers')
+        parser.add_argument('--hidden_layers', type=str, default='1024,1024,1024', help='comma-separated integers')
         parser.add_argument('--lstm_layers', type=int, default=20, help='Integer')
         parser.add_argument('--epsilon_decrement_per_episode', type=float, default=1e-3, help='Float')
         parser.add_argument('--batch_size', type=int, default=32, help='Integer')
-        parser.add_argument('--learning_rate', type=float, default=1e-4, help='Float')
+        parser.add_argument('--learning_rate', type=float, default=1e-5, help='Float')
         parser.add_argument('--memory_size', type=int, default=int(1e5), help='Integer')
         parser.add_argument('--lstm_time_step', type=int, default=10, help='Integer')
         parser.add_argument('--replace_target_iter', type=int, default=2000, help='Integer')
@@ -65,7 +69,12 @@ def main():
         
         epsilon_decrement_per_episode = args.epsilon_decrement_per_episode/(args.episode_time +args.timeout_delay)
                 
-
+    
+        advanced_priorities  = comma_seperated_string_to_list(args.advanced_priorities)
+        server_priorities = [1 for _ in range(args.number_of_servers)]
+        for i in range(len(advanced_priorities)):
+                server_priorities[i] = advanced_priorities[i]
+                
         
         hidden_layers = comma_seperated_string_to_list(args.hidden_layers)
         hyperparameters = {
@@ -103,7 +112,8 @@ def main():
         'federation_policy': args.federation_policy,
         'static_environment' :args.static_environment,
         'dropout_rate': args.dropout_rate,
-        'lr_schedueler_gamma'   : args.lr_schedueler_gamma
+        'lr_schedueler_gamma'   : args.lr_schedueler_gamma,
+        'server_priorities': server_priorities
         }
 
 

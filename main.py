@@ -97,6 +97,7 @@ def main():
                 delta_duration=hyperparameters['delta_duration'],
                 task_drop_penalty_multiplier=hyperparameters['task_drop_penalty_multiplier'],
                 task_computational_density = hyperparameters['task_computational_density'],
+                server_priorities= hyperparameters['server_priorities'],
                  number_of_clouds=NUMBER_OF_CLOUDS)
     
     
