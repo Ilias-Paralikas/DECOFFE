@@ -110,7 +110,8 @@ class Bookkeeper:
         score, average_score,drop_ratio,epsilon = np.mean(self.metrics['rewards_history'][-1]), np.mean(self.metrics['rewards_history'][-self.average_window:]),np.mean(self.metrics['task_drop_ratio_history'][-1]),self.metrics['epsilon_history'][-1]
         print('Episode: {}\tScore: {:.3f}\t Average Score: {:.3f}\tDrop Ratio: {:.3f}\tEpsilon: {:.3f}'.format(len(self.metrics['rewards_history']),score,average_score,drop_ratio ,epsilon))
     
-    
+    def get_agent_average_scores(self):
+        return np.array(self.metrics['rewards_history'][-self.average_window:]).mean(axis=0)
     def start_championship(self,championship_epsilon_start,championship_episode_start):
         self.championship_epsilon_start = championship_epsilon_start
         self.championship_episode_start = championship_episode_start

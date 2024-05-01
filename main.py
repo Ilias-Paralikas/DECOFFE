@@ -10,8 +10,9 @@ from decision_makers.uloof import ULOOF
 from decision_makers.local import Local
 from decision_makers.full_offloading import FullOffloading
 from federated_learning.flbase import FlBase
-from federated_learning.simpleaverage import SimpleAverage
-
+from federated_learning.simple_average import SimpleAverage
+from federated_learning.follow_the_leader import FollowTheLeader
+from federated_learning.weighted_average import WeightedAverage
 import torch    
 
 import json
@@ -21,7 +22,6 @@ import os
 NUMBER_OF_CLOUDS = 1
 def remove_id_from_list(lst, server_id):
     return lst[:server_id] + lst[server_id+1:]
-
 
 def main():
     decision_makers = {
@@ -35,7 +35,9 @@ def main():
     
     federation_policies ={
         'None':FlBase,
-        'SimpleAverage':SimpleAverage
+        'SimpleAverage':SimpleAverage,
+        'FollowTheLeader':FollowTheLeader,
+        'WeightedAverage':WeightedAverage
     }
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')  
     print(device)
@@ -139,7 +141,7 @@ def main():
                     
             for i in range(number_of_servers)]
     
-    federation_policy_maker  = federation_policies[hyperparameters['federation_policy']]()
+    federation_policy_maker  = federation_policies[hyperparameters['federation_policy']](averaging_frequency=hyperparameters['averaging_frequency'])
 
 
     for episode in range(episodes):
@@ -168,17 +170,17 @@ def main():
                                                 new_lstm_state=new_lstm_input,
                                                 done=done)
                     agents[i].learn()
-                    
-                    
-            if hyperparameters['averaging_frequency'] :
-                if episode % hyperparameters['averaging_frequency'] == 0:
-                    federation_policy_maker.average_weights(agents= agents)
             
+                       
                     
                     
             local_observations,active_queues  = local_observations_,active_queues_
             
         bookkeeper.reset_episode(agents[0].get_epsilon(),agents[0].get_learning_rate())
+        agent_average_scores = bookkeeper.get_agent_average_scores()
+        federation_policy_maker.average_weights(agents= agents,
+                                                agent_average_scores=agent_average_scores)
+
         
         champion_status,total_episodes = bookkeeper.get_champion(episode)
         for i in range(len(agents)):
