@@ -24,7 +24,7 @@ def main():
     parser = argparse.ArgumentParser(description='Script Configuration via Command Line')
 
     parser.add_argument('--plot_value', type=str, default ='rewards_history',help='name of the metric you want to plot. Note it must match the name in the metrics.pkl file')
-    parser.add_argument('--folder', type=str, default='meta_plots/set_2/set_2_logs/gamma', help='path to the folder containing the logs')
+    parser.add_argument('--folder', type=str, default='meta_plots/logs/priority_results/priorit_logs/learning_rate', help='path to the folder containing the logs')
     parser.add_argument('--average_window', type=int, default=500)
     
     args = parser.parse_args()  # Parse the command line arguments
