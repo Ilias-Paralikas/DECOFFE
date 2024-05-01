@@ -42,7 +42,7 @@ def main():
         parser.add_argument('--epsilon_decrement_per_episode', type=float, default=1e-3, help='Float')
         parser.add_argument('--batch_size', type=int, default=32, help='Integer')
         parser.add_argument('--learning_rate', type=float, default=1e-5, help='Float')
-        parser.add_argument('--memory_size', type=int, default=int(1e5), help='Integer')
+        parser.add_argument('--memory_size', type=int, default=int(5e5), help='Integer')
         parser.add_argument('--lstm_time_step', type=int, default=10, help='Integer')
         parser.add_argument('--replace_target_iter', type=int, default=2000, help='Integer')
         parser.add_argument('--optimizer', type=str, default='Adam', help='selected from https://pytorch.org/docs/stable/optim.html#algorithms, provided as a string')
