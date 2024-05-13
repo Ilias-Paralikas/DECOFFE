@@ -48,6 +48,9 @@ class DeepQNetwork(nn.Module):
         else:
             self.output_layer = nn.Linear(last_layer_size, self.number_of_actions)
         
+            
+        
+        
     def forward(self,state,lstm_input):
         batch_size = lstm_input.shape[0]
         h0 = torch.zeros(self.lstm_layers,batch_size,self.lstm_output_shape).to(lstm_input.device)
@@ -65,6 +68,8 @@ class DeepQNetwork(nn.Module):
             q_values = value + (advantage - torch.mean(advantage, dim=1, keepdim=True))
         else:
             q_values = self.output_layer(sequential_output)
+            
+        q_values = nn.Sigmoid()(q_values)
         return q_values
 
 class Agent(DescisionMakerBase):

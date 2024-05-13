@@ -46,7 +46,7 @@ def main():
         parser.add_argument('--lstm_time_step', type=int, default=10, help='Integer')
         parser.add_argument('--replace_target_iter', type=int, default=2000, help='Integer')
         parser.add_argument('--optimizer', type=str, default='Adam', help='selected from https://pytorch.org/docs/stable/optim.html#algorithms, provided as a string')
-        parser.add_argument('--loss_function', type=str, default='MSELoss', help='selected from https://pytorch.org/docs/stable/nn.html#loss-functions, provided as a string, without the nn')
+        parser.add_argument('--loss_function', type=str, default='BCELoss', help='selected from https://pytorch.org/docs/stable/nn.html#loss-functions, provided as a string, without the nn')
         parser.add_argument('--gamma', type=float, default=0.99, help='Float')
         parser.add_argument('--epsilon_end', type=float, default=0.01, help='float, between 0 and 1')
         parser.add_argument('--local_action_probability', type=float, default=0.5, help='Float when picking random action, the probability of chosing local actions')
