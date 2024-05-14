@@ -103,7 +103,7 @@ def main():
         'epsilon':epsilon,
         'gamma':args.gamma,
         'epsilon_end':args.epsilon_end,
-        'local_action_probability':args.local_action_probability,
+        # 'local_action_probability':args.local_action_probability,
         'save_model_frequency' :args.save_model_frequency,
         'descision_maker_choice': args.descision_maker_choice,
         'championship_epsilon_start' :args.championship_epsilon_start,

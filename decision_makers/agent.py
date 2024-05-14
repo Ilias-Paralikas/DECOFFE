@@ -95,7 +95,7 @@ class Agent(DescisionMakerBase):
                 dropout_rate,
                 epsilon,
                 epsilon_end,
-                local_action_probability,
+                # local_action_probability,
                 save_model_frequency,
                 champion_file,
                 train_in_exploit_state,
@@ -117,7 +117,7 @@ class Agent(DescisionMakerBase):
     self.epsilon_decrement = epsilon_decrement
     self.learning_rate =learning_rate
     self.epsilon_end =epsilon_end
-    self.local_action_probability =local_action_probability
+    # self.local_action_probability =local_action_probability
     self.checkpoint_folder= checkpoint_folder
     self.save_model_frequency = save_model_frequency
     self.train_in_exploit_state = train_in_exploit_state
@@ -210,10 +210,11 @@ class Agent(DescisionMakerBase):
         lstm_input = torch.tensor(lstm_history_np,dtype=torch.float32).to(self.device)
         action = np.argmax(self.Q_eval_network(observation, lstm_input).detach().cpu().numpy())
       else:
-          if np.random.rand() < self.local_action_probability:
-              action =  0
-          else:
-              action =  np.random.randint( 1, self.number_of_actions)
+          # if np.random.rand() < self.local_action_probability:
+          #     action =  0
+          # else:
+          #     action =  np.random.randint( 1, self.number_of_actions)
+        action =  np.random.randint( 0, self.number_of_actions)
       return action
 
 

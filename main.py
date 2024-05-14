@@ -129,7 +129,7 @@ def main():
                     checkpoint_folder =checkpoint_folders[i] ,
                     gamma = hyperparameters['gamma'],
                     epsilon_end = hyperparameters['epsilon_end'],
-                    local_action_probability = hyperparameters['local_action_probability'],
+                    # local_action_probability = hyperparameters['local_action_probability'],
                     save_model_frequency = hyperparameters['save_model_frequency'],
                     epsilon=hyperparameters['epsilon'],
                     train_in_exploit_state = args.train_in_exploit_state,
