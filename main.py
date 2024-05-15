@@ -151,6 +151,7 @@ def main():
         done = False
         local_observations,active_queues = environment.reset()
         
+        
 
         while not done:
             actions = np.zeros(number_of_servers,dtype=np.int8)
