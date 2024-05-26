@@ -24,8 +24,8 @@ def main():
     parser = argparse.ArgumentParser(description='Script Configuration via Command Line')
 
     parser.add_argument('--plot_value', type=str, default ='rewards_history',help='name of the metric you want to plot. Note it must match the name in the metrics.pkl file')
-    parser.add_argument('--folder', type=str, default='meta_plots/logs/priority_results/priorit_logs/learning_rate', help='path to the folder containing the logs')
-    parser.add_argument('--average_window', type=int, default=500)
+    parser.add_argument('--folder', type=str, default='meta_plots/logs/workshop/workshop_logs/learning_rate', help='path to the folder containing the logs')
+    parser.add_argument('--average_window', type=int, default=2000)
     
     args = parser.parse_args()  # Parse the command line arguments
     plot_value = args.plot_value  # Get the plot_value from the command line arguments
@@ -52,7 +52,7 @@ def main():
     plt.xlabel('episode')
     plt.ylabel(plot_value)
     plt.legend()
-    plt.savefig(os.path.join(folder, args.plot_value+'.png'))
+    plt.savefig(os.path.join(folder, args.plot_value+'.png'),dpi=500)
 
     
     # Truncate all lists to the same length
