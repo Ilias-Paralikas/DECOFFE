@@ -50,7 +50,7 @@ def main():
     parser.add_argument('--hyperparameters_file', type=str, default='hyperparameters/hyperparameters.json', help='This argument specifies the file where the hyperparameters are stored. The default file is "hyperparameters/hyperparameters.json"')
     parser.add_argument('--train_in_exploit_state', action="store_true", help='If this flag is set, the model will be trained in the exploit state.')
     parser.add_argument('--single_agent', default=None,type= str,help="This argument is used to specify a single agent's weights for all the agents. If this argument is provided, all agents will use the weights of the specified agent.")
-    parser.add_argument('--static_override',default=1, type=int,   help=': This argument specifies the window size for averaging the results for plotting. The default value is 500.')
+    parser.add_argument('--static_override',default=0, type=int,   help=': This argument specifies the window size for averaging the results for plotting. The default value is 500.')
 
     args = parser.parse_args()
     resume_run = args.resume_run
@@ -139,15 +139,9 @@ def main():
                     lr_schedueler_gamma = hyperparameters['lr_schedueler_gamma'],
                     update_weight_percentage = hyperparameters['update_weight_percentage'],
                     hyperparameters=hyperparameters)
-                    
             for i in range(number_of_servers)]
     
     federation_policy_maker  = federation_policies[hyperparameters['federation_policy']](averaging_frequency=hyperparameters['averaging_frequency'])
-
-    # k = 0
-    # with open('task_arrive.txt', 'r') as f:
-    #     # Read the entire contents of the file
-    #     contents = f.read()
 
 
     for episode in range(episodes):
@@ -168,12 +162,7 @@ def main():
                 lstm_input = remove_id_from_list(active_queues,i)
                 actions[i] = agents[i].choose_action(local_observations[i],lstm_input)
             (local_observations_,active_queues_), rewards, done, info = environment.step(actions)
-            # # assert contents[k]  == str(local_observations_[:,0])
-            # # k +=1
-            # with open('task_arrive.txt', 'a') as f:
-            #     # Write a string to the file
-            #     f.write(local_observations_[:,0].__str__())
-            #     f.write('\n')
+
 
             bookkeeper.store_timestep(info)
             if not hyperparameters['validate']:
