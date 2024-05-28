@@ -8,6 +8,12 @@ def comma_seperated_string_to_list(comma_seperated_String):
                 return []
         return [int(x) for x in comma_seperated_String.split(',')]
 
+def fill_array(string, length, default_value):
+        array  = comma_seperated_string_to_list(string)
+        values=  [default_value for _ in range(length)]
+        for i in range(len(array)):
+                values[i] = array[i]
+        return values
 
 def main():
         parser = argparse.ArgumentParser(description='Script Configuration via Command Line')
@@ -28,9 +34,14 @@ def main():
         # More hyperparameters
         parser.add_argument('--episode_time', type=int, default=100, help='Integer')
         parser.add_argument('--timeout_delay', type=int, default=10, help='Integer')
-        parser.add_argument('--max_bit_arrive', type=float, default=5.0, help='Float')
-        parser.add_argument('--min_bit_arrive', type=float, default=2.0, help='Float')
-        parser.add_argument('--task_arrive_probability', type=float, default=0.7, help='Float between 0 and 1')
+        parser.add_argument('--default_max_bit_arrive', type=float, default=5.0, help='Float')
+        parser.add_argument('--default_min_bit_arrive', type=float, default=2.0, help='Float')
+        parser.add_argument('--default_task_arrive_probability', type=float, default=0.7, help='Float between 0 and 1')
+
+        parser.add_argument('--max_bit_arrives', type=str, default=None, help='comma-separated integers')
+        parser.add_argument('--min_bit_arrives', type=str, default=None, help='comma-separated integers')
+        parser.add_argument('--task_arrive_probabilities', type=str, default=None, help='comma-separated integers')
+
         parser.add_argument('--delta_duration', type=float, default=0.1, help='Float')
         parser.add_argument('--task_drop_penalty_multiplier', type=float, default=4, help='Float')
         parser.add_argument('--task_computational_density', type=float, default=0.297, help='Float')
@@ -69,13 +80,7 @@ def main():
         
         epsilon_decrement_per_episode = args.epsilon_decrement_per_episode/(args.episode_time +args.timeout_delay)
                 
-    
-        priorities  = comma_seperated_string_to_list(args.priorities)
-        server_priorities = [1 for _ in range(args.number_of_servers)]
-        for i in range(len(priorities)):
-                server_priorities[i] = priorities[i]
-                
-        
+        server_priorities = fill_array(args.priorities, args.number_of_servers, 1)
         hidden_layers = comma_seperated_string_to_list(args.hidden_layers)
         hyperparameters = {
         'episodes': args.episodes,
@@ -83,9 +88,6 @@ def main():
         'cloud_computational_capacity': args.cloud_computational_capacity,
         'episode_time': args.episode_time,
         'timeout_delay': args.timeout_delay,
-        'max_bit_arrive': args.max_bit_arrive,
-        'min_bit_arrive': args.min_bit_arrive,
-        'task_arrive_probability': args.task_arrive_probability,
         'delta_duration': args.delta_duration,
         'task_drop_penalty_multiplier': args.task_drop_penalty_multiplier,
         'task_computational_density': args.task_computational_density,
@@ -124,6 +126,10 @@ def main():
         for row in hyperparameters['transmission_capacities']:
                 row[-1] = args.vertical_transmission_capacity
 
+        hyperparameters['min_bit_arrives'] = fill_array(args.min_bit_arrives, hyperparameters['number_of_servers'], args.default_min_bit_arrive)
+        hyperparameters['max_bit_arrives'] = fill_array(args.max_bit_arrives, hyperparameters['number_of_servers'], args.default_max_bit_arrive)
+        hyperparameters['task_arrive_probabilities'] = fill_array(args.task_arrive_probabilities, hyperparameters['number_of_servers'], args.default_task_arrive_probability)
+        
         json_object = json.dumps(hyperparameters,indent=4) ### this saves the array in .json format)
         
         with open(args.hyperparameters_file, "w") as outfile:

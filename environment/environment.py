@@ -3,6 +3,7 @@ import numpy as np
 from .task import Task
 from .servers import Server
 from .cloud import Cloud
+from .task_generator import TaskGenerator
 
 
 class Environment:
@@ -13,9 +14,9 @@ class Environment:
                  cloud_computational_capacity,
                  episode_time,
                  timeout_delay,
-                 max_bit_arrive ,
-                 min_bit_arrive ,
-                 task_arrive_probability,
+                 max_bit_arrives ,
+                 min_bit_arrives ,
+                 task_arrive_probabilities,
                  delta_duration,
                  task_drop_penalty_multiplier,
                  task_computational_density,
@@ -43,9 +44,9 @@ class Environment:
          
         self.episode_time= episode_time
         self.timeout_delay= timeout_delay
-        self.min_bit_arrive = min_bit_arrive
-        self.max_bit_arrive= max_bit_arrive
-        self.task_arrive_probability=  task_arrive_probability
+        self.min_bit_arrives = min_bit_arrives
+        self.max_bit_arrives= max_bit_arrives
+        self.task_arrive_probabilities=  task_arrive_probabilities
         self.episode_time_end = episode_time+timeout_delay
         self.task_drop_penalty_multiplier = task_drop_penalty_multiplier
         self.task_computational_density = task_computational_density
@@ -58,6 +59,13 @@ class Environment:
                               public_queues_computational_capacity = self.servers_public_queues_computational_capacities[i],
                               offloading_queue_transmision_capacities = self.transmission_capacities[i])
                        for i in range(self.number_of_servers)]
+        self.task_generator = [
+            TaskGenerator(min_bit_arrive=min_bit_arrives[i],
+                          max_bit_arrive=max_bit_arrives[i],
+                          task_arrive_probability=task_arrive_probabilities[i],
+                          episode_time=episode_time)
+            for i in range(self.number_of_servers)
+        ]
         
         self.cloud  = Cloud(
             number_of_servers=self.number_of_servers,
@@ -75,10 +83,10 @@ class Environment:
         self.cloud.reset()
         self.reset_tasks_to_be_transmited()
         
+        for task_generator in self.task_generator:
+            task_generator.reset()
+        self.bitarrive = [self.task_generator[i].step() for i in range(self.number_of_servers)]
         
-        self.bitarrive = np.random.uniform(self.min_bit_arrive, self.max_bit_arrive, size= self.number_of_servers) 
-        self.bitarrive = self.bitarrive * (np.random.uniform(0, 1, size=[self.number_of_servers])< self.task_arrive_probability)
-
         local_observations = np.zeros((self.number_of_servers,
                                 self.state_dimensions)) 
         active_queues  =[0  for _ in range(self.number_of_servers +self.number_of_clouds)]         
@@ -141,11 +149,7 @@ class Environment:
 
         old_bitarrive = self.bitarrive
 
-        if self.current_time < self.episode_time: 
-            self.bitarrive = np.random.uniform(self.min_bit_arrive, self.max_bit_arrive, size= self.number_of_servers) 
-            self.bitarrive = self.bitarrive * (np.random.uniform(0, 1, size=[self.number_of_servers])< self.task_arrive_probability)
-        else:
-            self.bitarrive = np.zeros(self.number_of_servers)
+        self.bitarrive = [self.task_generator[i].step() for i in range(self.number_of_servers)]
         
 
         local_observations = np.zeros((self.number_of_servers,

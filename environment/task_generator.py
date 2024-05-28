@@ -27,6 +27,3 @@ class TaskGenerator():
         self.current_time +=1
         return bitarrive
     
-t= TaskGenerator(0,1,0.5,100)
-x = t.step()
-print(x)
