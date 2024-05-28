@@ -3,13 +3,13 @@ import json
 import os 
 NUMBER_OF_CLOUDS =1
 
-def comma_seperated_string_to_list(comma_seperated_String):
+def comma_seperated_string_to_list(comma_seperated_String,dtype):
         if comma_seperated_String is None:
                 return []
-        return [int(x) for x in comma_seperated_String.split(',')]
+        return [dtype(x) for x in comma_seperated_String.split(',')]
 
-def fill_array(string, length, default_value):
-        array  = comma_seperated_string_to_list(string)
+def fill_array(string, length, default_value,dtype):
+        array  = comma_seperated_string_to_list(string,dtype)
         values=  [default_value for _ in range(length)]
         for i in range(len(array)):
                 values[i] = array[i]
@@ -80,8 +80,8 @@ def main():
         
         epsilon_decrement_per_episode = args.epsilon_decrement_per_episode/(args.episode_time +args.timeout_delay)
                 
-        server_priorities = fill_array(args.priorities, args.number_of_servers, 1)
-        hidden_layers = comma_seperated_string_to_list(args.hidden_layers)
+        server_priorities = fill_array(args.priorities, args.number_of_servers, 1,float)
+        hidden_layers = comma_seperated_string_to_list(args.hidden_layers,int)
         hyperparameters = {
         'episodes': args.episodes,
         'number_of_servers': args.number_of_servers,
@@ -126,9 +126,9 @@ def main():
         for row in hyperparameters['transmission_capacities']:
                 row[-1] = args.vertical_transmission_capacity
 
-        hyperparameters['min_bit_arrives'] = fill_array(args.min_bit_arrives, hyperparameters['number_of_servers'], args.default_min_bit_arrive)
-        hyperparameters['max_bit_arrives'] = fill_array(args.max_bit_arrives, hyperparameters['number_of_servers'], args.default_max_bit_arrive)
-        hyperparameters['task_arrive_probabilities'] = fill_array(args.task_arrive_probabilities, hyperparameters['number_of_servers'], args.default_task_arrive_probability)
+        hyperparameters['min_bit_arrives'] = fill_array(args.min_bit_arrives, hyperparameters['number_of_servers'], args.default_min_bit_arrive,float)
+        hyperparameters['max_bit_arrives'] = fill_array(args.max_bit_arrives, hyperparameters['number_of_servers'], args.default_max_bit_arrive,float)
+        hyperparameters['task_arrive_probabilities'] = fill_array(args.task_arrive_probabilities, hyperparameters['number_of_servers'], args.default_task_arrive_probability,float)
         
         json_object = json.dumps(hyperparameters,indent=4) ### this saves the array in .json format)
         
