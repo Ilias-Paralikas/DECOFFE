@@ -16,5 +16,6 @@ class SimpleAverage(FlBase):
 
         for agent in agents:
             agent.Q_eval_network.load_state_dict(average_weights)
-                
+            
+        return   
         

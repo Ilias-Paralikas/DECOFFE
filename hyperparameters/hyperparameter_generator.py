@@ -47,7 +47,7 @@ def main():
         parser.add_argument('--task_computational_density', type=float, default=0.297, help='Float')
         parser.add_argument('--priorities', type=str, default=None, help='comma-separated integers')
 
-        # Neural network hy     perparameters
+        # Neural network hyperparameters
         parser.add_argument('--hidden_layers', type=str, default='1024,1024,1024', help='comma-separated integers')
         parser.add_argument('--lstm_layers', type=int, default=20, help='Integer')
         parser.add_argument('--epsilon_decrement_per_episode', type=float, default=1e-3, help='Float')
