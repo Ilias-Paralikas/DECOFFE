@@ -82,7 +82,8 @@ def main():
 
     bookkeeper.start_championship(championship_epsilon_start=hyperparameters['championship_epsilon_start'],
                                   championship_episode_start=hyperparameters['championship_episode_start'])  
-    print(hyperparameters)
+    for key in hyperparameters:
+        print(key, ' : ' ,hyperparameters[key])
     
     
     episodes  =hyperparameters['episodes']
@@ -142,7 +143,7 @@ def main():
             for i in range(number_of_servers)]
     
     federation_policy_maker  = federation_policies[hyperparameters['federation_policy']](averaging_frequency=hyperparameters['averaging_frequency'])
-
+    np.random.seed(0)
 
     for episode in range(episodes):
         if hyperparameters['static_environment'] :

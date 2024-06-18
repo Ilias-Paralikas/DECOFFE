@@ -210,10 +210,6 @@ class Agent(DescisionMakerBase):
         lstm_input = torch.tensor(lstm_history_np,dtype=torch.float32).to(self.device)
         action = np.argmax(self.Q_eval_network(observation, lstm_input).detach().cpu().numpy())
       else:
-          # if np.random.rand() < self.local_action_probability:
-          #     action =  0
-          # else:
-          #     action =  np.random.randint( 1, self.number_of_actions)
         action =  np.random.randint( 0, self.number_of_actions)
       return action
 
@@ -284,7 +280,6 @@ class Agent(DescisionMakerBase):
     loss = self.loss_function(q_eval,q_target)
     loss.backward()
     self.optimizer.step()
-    self.schedueler.step()
 
     self.epsilon = max(self.epsilon - self.epsilon_decrement, self.epsilon_end)
 
